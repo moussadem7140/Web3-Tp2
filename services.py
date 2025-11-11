@@ -1,7 +1,7 @@
 import re
 import os
 from datetime import datetime
-from flask import Flask, render_template, abort, request, redirect, make_response, url_for, Blueprint, current_app as app, session
+from flask import Flask, render_template, abort, request, redirect, make_response, url_for, Blueprint, current_app as app, session, flash
 import mysql.connector
 from mysql.connector import Error
 from babel import dates ,numbers
@@ -15,12 +15,12 @@ devise ={
     'fr_CA':'CAD',
     'en_CA':'CAD'
 }
-@app.route("/changer_locale")
+@bp_services.route("/changer_locale")
 def changer_locale():
     """Permet de changer la langue de la page"""
     locale = request.args.get("locale", BABEL_DEFAULT_LOCALE)
     if locale not in langues_disponibles:
-        return redirect('/')
+        return redirect(url_for('services.accueil'))
     reponse = make_response(redirect(request.referrer or '/'))
     reponse.set_cookie("langue", locale)
     return reponse
@@ -36,14 +36,14 @@ def accueil():
     with bd.creer_connexion() as conn:
         services = bd.get_services(conn)
 
-    return render_template("accueil.jinja", services = services)
+    return render_template("services/accueil.jinja", services = services)
 
 @bp_services.route("/liste_services")
 def listes_services():
     """Affiche les  cinq derniers services de particuliers ajoutés selon la date d’ajout, du plus récent au plus ancien"""
     with bd.creer_connexion() as conn:
         services = bd.get_services(conn, tous=True)
-    return render_template("listes_services.jinja", services = services)
+    return render_template("services/listes_services.jinja", services = services)
 
 @bp_services.route("details_services/<int:id_service>")
 def details_service(id_service):
@@ -59,7 +59,7 @@ def details_service(id_service):
         if service.get('cout') is not None:
             service['cout']=numbers.format_currency(service['cout'],devise[locale],locale=locale)
 
-        return render_template("service.jinja", service = service)
+        return render_template("services/service.jinja", service = service)
 
     except Error:
         abort(500, "Erreur en lien avec la base de données")
@@ -140,7 +140,8 @@ def ajouter_service():
 
                 if not class_titre and not class_localisation and not class_description and not class_categorie and not class_cout and not class_nom_photo:
                     bd.add_service(conn, service)
-                    return redirect('/confirmation_service', code= 303)
+                    flash("Le service a été ajouté avec succès.", "success")
+                    return redirect(url_for('services.acceuil'), code= 303)
 
     return render_template('ajouter_service.jinja', class_titre = class_titre, class_localisation = class_localisation,class_description= class_description,
                            class_cout= class_cout, class_nom_photo= class_nom_photo,categories= categorie, titre = titre, localisation=localisation,
@@ -200,16 +201,13 @@ def modifier_service():
                 with bd.creer_connexion() as conn:
                     with conn.get_curseur() as curseur:
                         bd.update_service(conn, id_service, titre, localisation, description, cout, actif)
-                        return redirect('/confirmation_service', 303)
+                        flash("Le service a été modifié avec succès.", "success")
+                        return redirect(url_for('services.acceuil'), 303)
 
-        return render_template('modifier_service.jinja', service = service, class_titre = class_titre, class_localisation = class_localisation,
+        return render_template('services/modifier_service.jinja', service = service, class_titre = class_titre, class_localisation = class_localisation,
                            class_description = class_description, class_cout = class_cout)
     except Error :
         abort(500, "Erreur en lien avec la base de données")
 
-@bp_services.route("/confirmation_service")
-def confirmation_service():
-    """Message de confirmation"""
-    return render_template("confirmation_service.jinja")
 
 

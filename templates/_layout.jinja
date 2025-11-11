@@ -29,20 +29,20 @@
 
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item pe-4">
-                            <a class="nav-link active" aria-current="page" href="/">Accueil</a>
+                            <a class="nav-link active" aria-current="page" href="{{url_for('services.accueil')}}">Accueil</a>
                         </li>
                         <li class="nav-item pe-4">
-                            <a class="nav-link" href="/ajouter_service">Ajouter un service</a>
+                            <a class="nav-link" href="{{url_for('services.ajouter_service')}}">Ajouter un service</a>
                         </li>
                         <li class="nav-item pe-4">
-                            <a class="nav-link" href="/liste_services">Liste des services</a>
+                            <a class="nav-link" href="{{url_for('services.listes_services')}}">Liste des services</a>
                         </li>
                     </ul>
 
                     <div class="d-flex align-items-center ms-lg-3 mt-2 mt-lg-0">
                         <span class="me-2 text-white">🌍Langue:</span>
-                        <a href="/changer_locale?locale=fr_CA" class="btn btn-sm btn-outline-light me-1">FR</a>
-                        <a href="/changer_locale?locale=en_CA" class="btn btn-sm btn-outline-light ms-1">EN</a>
+                        <a href="{{url_for('services.changer_locale', locale=fr_CA)}}" class="btn btn-sm btn-outline-light me-1">FR</a>
+                        <a href="{{url_for('services.changer_locale', locale=en_CA)}}" class="btn btn-sm btn-outline-light ms-1">EN</a>
                     </div>
                 </div>
             </div>
@@ -52,6 +52,18 @@
 
     <main>
         <h2>{{ titre }}</h2>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                     <div class="flash-container">
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} d-flex justify-content-between align-items-center" role="alert">
+                        <span>{{ message }}</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                         {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
 
         {% block contenu%}
 

@@ -35,7 +35,7 @@
                 </p>
             </div>
             <div class="col-md-4">
-                <a href="/modifier_service?id_service={{service.id_service}}" class="btn btn-primary">Modifier</a>
+                <a href="{{url_for('services.modifier_service', id_service=service.id_service)}}" class="btn btn-primary">Modifier</a>
             </div>
         </div>
     </div>

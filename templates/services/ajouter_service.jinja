@@ -8,7 +8,7 @@
     <img src="/static/images/default.png" width="400" height="300" class="card-img-top" alt="{{ titre }}">
     <div class="card-body">
 
-        <form class="row g-3" method="POST" action="/ajouter_service" novalidate="novalidate">
+        <form class="row g-3" method="POST" action="{{url_for('services.ajouter_service'}}" novalidate="novalidate">
             <div class="col-12">
                 <label for="titre" class="form-label">Titre :</label>
                 <input type="text" id="titre" name="titre" class="form-control {{ class_titre }}" value="{{ titre }}">

@@ -8,7 +8,7 @@
 <div class="card container shadow mt-4">
     <img src="/static/images/default.png" width="400" height="300" class="card-img-top" alt="{{ service.titre }}">
     <div class="card-body">
-        <form method="POST" action="/modifier_service?id_service={{ service.id_service }}" class="row g-3"
+        <form method="POST" action="{{url_for('services.modifier_service', id_service=service.id_service)}}" class="row g-3"
             novalidate="novalidate">
             <input type="hidden" name="id_service" value="{{ service.id_service }}">
             <div class="col-12">

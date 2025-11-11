@@ -20,7 +20,7 @@
                         <strong>Catégorie :</strong> {{ service.nom_categorie }} <br>
                         <strong>Localisation :</strong> {{ service.localisation }}
                     </p>
-                    <a href="/service/{{service.id_service}}" class="btn btn-primary">Voir détails</a>
+                    <a href="{{url_for('services.details_service', id_service=service.id_service)}}" class="btn btn-primary">Voir détails</a>
                 </div>
             </div>
         </div>
