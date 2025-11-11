@@ -2,6 +2,8 @@
 Une application Flask d'échange de service
 """
 import re
+import mysql.connector
+from mysql.connector import Error
 from flask import Flask, render_template
 from flask.logging import create_logger
 from compte import bp_compte
