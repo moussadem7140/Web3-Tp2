@@ -51,7 +51,7 @@ def get_services(conn, tous = False):
                     FROM services s JOIN categories c ON s.id_categorie = c.id_categorie
                     WHERE s.actif = 1 ORDER BY s.date_creation limit 5''')
             return curseur.fetchall()
-        
+
 def get_service(conn, id_service):
        with conn.get_curseur() as curseur:
                 curseur.execute('''SELECT s.id_service, s.titre, s.localisation, s.description, s.cout, s.date_creation, s.actif, c.nom_categorie
@@ -77,3 +77,31 @@ def update_service(conn, id_service, titre, localisation, description, cout, act
                 curseur.execute('''UPDATE services
                             SET titre = %s, localisation = %s, description = %s, cout =%s, actif = %s
                             WHERE id_service = %s''', (titre, localisation, description, cout, actif, id_service))
+
+def creer_user(conn,user):
+    """ Permet d'ajouter un utilisateur dans la bd"""
+    with conn.get_curseur() as curseur:
+        curseur.execute("""INSERT INTO `utilisateur` (`nom`,`courriel`, `mdp`, `role`, `credit`)
+                           VALUES (%(nom)s,%(courriel)s, %(mdp)s, %(role)s, %(credit)s)""",user)
+
+
+def authentification(conn,courriel,mdp):
+    """ Permet de verifier l'identifiant de l'utilisateur"""
+    with conn.get_curseur() as curseur:
+        curseur.execute("""SELECT *
+                        FROM utilisateur WHERE courriel= %(courriel)s AND mdp=%(mdp)s""",
+                        {
+                            "courriel": courriel,
+                            "mdp": mdp
+                        })
+        user = curseur.fetchone()
+        return user
+
+def verifie_doublon_courriel(conn, courriel):
+    "Retourne true si le courriel est utilisé false si non"
+    with conn.get_curseur() as curseur:
+        curseur.execute("SELECT courriel FROM utilisateur WHERE courriel= %(courriel)s",
+                         {"courriel": courriel})
+        user = curseur.fetchone()
+
+        return user

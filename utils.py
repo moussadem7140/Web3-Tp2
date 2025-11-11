@@ -3,17 +3,7 @@ Fichier contient les fonctions utiles et qui sont repeter dans plusieurs endroit
 """
 import os
 import hashlib
-from flask import render_template, current_app
-
-def get_image_path(id_service):
-    """Retourne le chemin web de l'image si elle existe, sinon celui d'une image par défaut"""
-    nom_image  = f"service_{id_service}"
-    chemin_fichier = os.path.join(current_app.root_path, "static", "images", "services", nom_image)
-
-    if os.path.exists(chemin_fichier):
-        return f"/static/images/services/{nom_image}"
-
-    return "/static/images/services/defaut.jpg"
+from flask import render_template
 
 def hacher_mdp(mdp_en_clair):
     """Prend un mot de passe en clair et lui applique une fonction de hachage"""
@@ -29,7 +19,7 @@ def valider_formulaire(nom, courriel, credit, mdp, mdp_repeat, regex_email, rege
         erreurs["class_nom"] = "is-valid"
 
 
-    if regex_html.match(courriel) or not regex_email.match(courriel) or not courriel:
+    if not regex_html.match(courriel) or not regex_email.match(courriel) or not courriel:
         erreurs["class_courriel"] = "is-invalid"
     else:
         erreurs["class_courriel"] = "is-valid"
