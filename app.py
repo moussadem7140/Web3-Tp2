@@ -27,11 +27,7 @@ def services_particulier():
     """Affiche les  cinq derniers services de particuliers ajoutés selon la date d’ajout, du plus récent au plus ancien"""
 
     with bd.creer_connexion() as conn:
-        with conn.get_curseur() as curseur:
-            curseur.execute('''SELECT s.id_service, s.titre, s.localisation, s.date_creation,s.photo, c.nom_categorie
-                            FROM services s JOIN categories c ON s.id_categorie = c.id_categorie
-                            WHERE s.actif = 1 ORDER By s.date_creation DESC LIMIT 5''')
-            services = curseur.fetchall()
+        services = bd.get_services(conn)
 
     return render_template("accueil.jinja", services = services)
 
@@ -54,11 +50,7 @@ def get_local():
 def listes_services():
     """Affiche les  cinq derniers services de particuliers ajoutés selon la date d’ajout, du plus récent au plus ancien"""
     with bd.creer_connexion() as conn:
-        with conn.get_curseur() as curseur:
-            curseur.execute('''SELECT s.id_service, s.titre, s.localisation, s.date_creation,s.photo, c.nom_categorie
-                            FROM services s JOIN categories c ON s.id_categorie = c.id_categorie ORDER By s.date_creation''')
-            services = curseur.fetchall()
-
+        services = bd.get_services(conn, tous=True)
     return render_template("listes_services.jinja", services = services)
 
 @app.route("/service/<int:id_service>")
@@ -67,15 +59,7 @@ def details_service(id_service):
     locale = get_local()
     try :
         with bd.creer_connexion() as conn:
-            with conn.get_curseur() as curseur:
-                curseur.execute('''SELECT s.id_service, s.titre, s.localisation, s.description, s.cout, s.date_creation, s.actif, c.nom_categorie
-                            FROM services s JOIN categories c ON s.id_categorie = c.id_categorie
-                            WHERE s.id_service = %(id)s''',
-                {
-                    "id": id_service
-                })
-                service = curseur.fetchone()
-
+            service = bd.get_service(conn, id_service)
         if service is None:
             abort(404, "Jeu non trouvé")
         if service.get('date_creation'):
@@ -109,12 +93,9 @@ def ajouter_service():
     photo = ""
 
     with bd.creer_connexion() as conn:
-        with conn.get_curseur() as curseur:
-            curseur.execute("""
-            SELECT id_categorie, nom_categorie FROM categories """)
-            categorie = curseur.fetchall()
+        categorie  = bd.get_categories(conn)
 
-            if request.method == 'POST':
+        if request.method == 'POST':
                 titre = request.form.get("titre", "").strip()
                 localisation = request.form.get("localisation", "").strip()
                 description = request.form.get("description", "").strip()
@@ -122,7 +103,17 @@ def ajouter_service():
                 actif = int(request.form.get("actif", 1))
                 id_categorie = request.form.get("id_categorie", default="")
                 photo = request.form.get("photo", "").strip()
-
+                service={
+                    'titre': titre,
+                    'localisation': localisation,
+                    'description': description,
+                    'cout': cout,
+                    'actif': actif,
+                    'id_categorie': id_categorie,
+                    'photo': photo,
+                    'id_utilisateur': 1,
+                    'date_creation': datetime.now()
+                }
                 if id_categorie:
                     try:
                         id_categorie=int(id_categorie)
@@ -157,10 +148,7 @@ def ajouter_service():
 
 
                 if not class_titre and not class_localisation and not class_description and not class_categorie and not class_cout and not class_nom_photo:
-                    date_creation = datetime.now()
-                    curseur.execute('''INSERT INTO services(titre, description,localisation, actif, cout, id_categorie, date_creation, photo)
-                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)''', (titre,description, localisation, actif, cout, id_categorie, date_creation, photo))
-                    conn.commit()
+                    bd.add_service(conn, service)
                     return redirect('/confirmation_service', code= 303)
 
     return render_template('ajouter_service.jinja', class_titre = class_titre, class_localisation = class_localisation,class_description= class_description,
@@ -178,14 +166,10 @@ def modifier_service():
         abort(400, "id_service du service manque dans l'URL")
     try :
         with bd.creer_connexion() as conn:
-            with conn.get_curseur() as curseur:
-                curseur.execute('SELECT s.*, c.nom_categorie FROM services s ' \
-                'JOIN categories c ON s.id_categorie = c.id_categorie WHERE id_service = %(id)s',
-                {"id": id_service})
-                service = curseur.fetchone()
+            service = bd.get_service(conn, id_service)
 
-                if not service :
-                    abort(404, "Service non trouvé")
+            if not service :
+                abort(404, "Service non trouvé")
         if service.get('date_creation'):
             service['date_creation'] = dates.format_datetime(service['date_creation'], locale=locale)
 
@@ -224,10 +208,7 @@ def modifier_service():
             if not class_titre and not class_localisation and not class_description and not class_cout:
                 with bd.creer_connexion() as conn:
                     with conn.get_curseur() as curseur:
-                        curseur.execute('''UPDATE services
-                                    SET titre = %s, localisation = %s, description = %s, cout =%s, actif = %s
-                                    WHERE id_service = %s''', (titre, localisation, description, cout, actif, id_service))
-                        conn.commit()
+                        bd.update_service(conn, id_service, titre, localisation, description, cout, actif)
                         return redirect('/confirmation_service', 303)
 
         return render_template('modifier_service.jinja', service = service, class_titre = class_titre, class_localisation = class_localisation,
@@ -268,3 +249,5 @@ def internal_server_error(e):
         message = "erreur en lien avec la base de donnée"
 
     return render_template('page_erreur.jinja', message= message, code = 500 ), 500
+
+app.run()
