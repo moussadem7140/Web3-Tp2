@@ -1,0 +1,13 @@
+{% extends "_layout.jinja" %}
+
+{% block title %}Page d'erreur | PianoServices{% endblock %}
+
+{% block contenu %}
+    <div class="error-container text-center mt-5">
+    <div class="error-box p-4 shadow rounded">
+        <h1 class="display-1">{{ code }}</h1>
+        <p class="lead">{{ message }}</p>
+        <a href="/" class="btn btn-primary">Retour à l'accueil</a>
+    </div>
+</div>
+{% endblock %}

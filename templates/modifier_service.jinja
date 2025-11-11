@@ -1,0 +1,69 @@
+{# Template pour les détails d’un service #}
+{% extends "_layout.jinja" %}
+
+{% block title %}Modifier un service | PianoServices{% endblock %}
+
+{% block contenu %}
+
+<div class="card container shadow mt-4">
+    <img src="/static/images/default.png" width="400" height="300" class="card-img-top" alt="{{ service.titre }}">
+    <div class="card-body">
+        <form method="POST" action="/modifier_service?id_service={{ service.id_service }}" class="row g-3"
+            novalidate="novalidate">
+            <input type="hidden" name="id_service" value="{{ service.id_service }}">
+            <div class="col-12">
+                <label for="titre" class="form-label">Titre :</label>
+                <input type="text" id="titre" name="titre" class="form-control {{ class_titre }}"
+                    value="{{ service.titre }}">
+                <div class="invalid-feedback">Veuillez entrer un titre</div>
+            </div>
+            <div class="col-12">
+                <label for="localisation" class="form-label">Localisation :</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                    <input type="text" id="localisation" name="localisation"
+                        class="form-control {{ class_localisation }}" value="{{ service.localisation }}">
+                </div>
+                <div class="invalid-feedback">Veuillez entrer une localisation valide.</div>
+            </div>
+            <div class="col-12">
+                <label for="description" class="form-label">Description :</label>
+                <textarea id="description" name="description" class="form-control {{ class_description }}"
+                    rows="3">{{ service.description }}</textarea>
+                <div class="invalid-feedback">Veuillez entrer une description.</div>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Catégorie :</label>
+                <input type="text" class="form-control" value="{{ service.nom_categorie }}" disabled>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">Date de création :</label>
+                <input type="text" class="form-control" value="{{ service.date_creation }}" disabled>
+            </div>
+            <div class="col-12">
+                <label for="cout" class="form-label">Prix :</label>
+                <input type="number" step="0.01" id="cout" name="cout" class="form-control {{ class_cout }}"
+                    value="{{ service.cout }}">
+                <div class="invalid-feedback">Veuillez entrer un prix valide</div>
+            </div>
+            <div class="col-12">
+                <input type="hidden" name="actif" value="0">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="actif" name="actif" value="1" {% if
+                        service.actif %}checked{% endif %}>
+                    <label class="form-check-label" for="actif">
+                        Actif
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="btn btn-success">Enregistrer</button>
+                <a href=" /service/{{service.id_service}}" class="btn btn-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

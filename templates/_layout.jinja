@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+
+<head>
+    <meta charset="utf-8" />
+    <title>{{titre}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/static/favicon.ico" />
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="static/css/styles.sass" />
+</head>
+
+<body>
+    <header>
+        <nav class="cc-navbar navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand text-uppercase mx-4 py-3" href="/">
+                    🎹 <em>PianoServices</em>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item pe-4">
+                            <a class="nav-link active" aria-current="page" href="/">Accueil</a>
+                        </li>
+                        <li class="nav-item pe-4">
+                            <a class="nav-link" href="/ajouter_service">Ajouter un service</a>
+                        </li>
+                        <li class="nav-item pe-4">
+                            <a class="nav-link" href="/liste_services">Liste des services</a>
+                        </li>
+                    </ul>
+
+                    <div class="d-flex align-items-center ms-lg-3 mt-2 mt-lg-0">
+                        <span class="me-2 text-white">🌍Langue:</span>
+                        <a href="/changer_locale?locale=fr_CA" class="btn btn-sm btn-outline-light me-1">FR</a>
+                        <a href="/changer_locale?locale=en_CA" class="btn btn-sm btn-outline-light ms-1">EN</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+
+    <main>
+        <h2>{{ titre }}</h2>
+
+        {% block contenu%}
+
+        {% endblock%}
+    </main>
+
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+        <div class="col-md-4 d-flex align-items-center container">
+            <span class="mb-3 mb-md-0 text-body-secondary">© 2025 - Créé par Valdess POMBOUH TASSÉ</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

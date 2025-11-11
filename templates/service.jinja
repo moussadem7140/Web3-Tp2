@@ -1,0 +1,45 @@
+{# Template pour les détails d’un service #}
+{% extends "_layout.jinja" %}
+
+{% block title %} Detail d'un service| PianoServices{% endblock %}
+
+{% block contenu %}
+
+<div class="card container mt-4">
+    <h3 class="card-header "> {{ service.titre }}</h3>
+
+    <img src="/static/images/default.png" class="card-img p-2" width="400"
+        height="500" alt="Image annonce" />
+    <div class="card-body">
+     <hr>
+        <div class="row mb-2">
+            <p><strong>Localisation :</strong> {{service.localisation}}</p>
+            <p><strong>Description :</strong> {{ service.description }}</p>
+            <p><strong>Date de création :</strong> {{ service.date_creation }}</p>
+            <p><strong>Catégorie :</strong> {{ service.nom_categorie }}</p>
+        </div>
+        <hr>
+        <div class="row text-center">
+            <div class="col-md-4">
+                <h5 class="card-title">Prix</h5>
+                <p class="card-text fw-bold">{{ service.cout }}</p>
+            </div>
+            <div class="col-md-4">
+                <h5 class="card-title">Statut</h5>
+                <p class="card-text">
+                    {% if service.actif == 1 %}
+                    <span class="text-success">Active</span>
+                    {% else %}
+                    <span class="text-danger">Inactive</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-md-4">
+                <a href="/modifier_service?id_service={{service.id_service}}" class="btn btn-primary">Modifier</a>
+            </div>
+        </div>
+    </div>
+    <hr>
+</div>
+
+{% endblock %}

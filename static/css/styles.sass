@@ -1,0 +1,24 @@
+// Les fichiers sAss n'ont pas de point-virgule ni d'accolade
+// Vous pouvez utiliser des .scss OU .sass à votre choix
+
+@use "bootstrap"
+
+body
+    @extend .container
+
+nav, main, footer
+    @extend .pb-5
+
+
+.card
+    padding: 15px
+    border-radius: 3px
+
+footer
+    background-color: #272e39
+    padding: 15px
+    text-align: center
+
+    p
+        color: #f6f5f2
+        font-size: 14px
