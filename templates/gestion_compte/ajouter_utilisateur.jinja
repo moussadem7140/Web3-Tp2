@@ -1,0 +1,62 @@
+{% extends "_layout.jinja" %}
+
+{% block contenu %}
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 bg-secondary" style="max-width: 600px; width: 100%;">
+        <div class="card-body">
+            <h4 class="card-title text-center">Formulaire de création de compte</h4>
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="retroactions">
+                {% for message in messages %}
+                <div class="alert alert-dismissible alert-warning">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <p class="mb-0 text-center fw-bold">{{ message }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <form method="post" action="{{ url_for('compte.creer_compte') }}" novalidate>
+                <div class="mb-3">
+                    <label class="form-label" for="nom">Nom</label>
+                    <input type="text" class="form-control {{ class_nom }}" name="nom" id="nom" value="{{ nom }}">
+                    <div class="invalid-feedback">Veuillez entrer un nom valide.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="courriel">Courriel</label>
+                    <input type="email" class="form-control {{ class_courriel }}" name="courriel" id="courriel"
+                        value="{{ courriel }}">
+                    <div class="invalid-feedback">Vous devez définir un courriel valide sur 50 caractères maximum !</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="credit">Crédit</label>
+                    <input type="text" class="form-control {{ class_credit }}" name="credit" id="credit" value="{{ credit }}">
+                    <div class="invalid-feedback">Le crédit est obligatoire.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="mdp">Mot de passe</label>
+                    <input type="password" class="form-control {{ class_mdp }}" name="mdp" id="mdp">
+                    <div class="invalid-feedback">Veuillez définir un mot de passe !</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="mdp_repeat">Répéter le mot de passe</label>
+                    <input type="password" class="form-control {{ class_mdp_repeat }}" name="mdp_repeat" id="mdp_repeat">
+                    <div class="invalid-feedback">Les mots de passe saisis ne sont pas identiques !</div>
+                </div>
+
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary w-50">Créer le compte</button>
+                    <a href="/" class="btn btn-secondary">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

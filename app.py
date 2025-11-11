@@ -9,9 +9,11 @@ from flask.logging import create_logger
 from mysql.connector import Error
 
 import bd
+from compte import bp_compte
 
 app = Flask(__name__)
 logger = create_logger(app)
+app.register_blueprint(bp_compte, url_prefix = '/compte')
 
 balises_html = re.compile(r'<(.*)>.*?|<(.*) />')
 langues_disponibles = ["en_CA", "fr_CA"]
