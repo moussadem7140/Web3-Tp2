@@ -57,3 +57,41 @@ def creer_compte():
         return redirect("/", code=303)
 
     return redirect("comptes/liste_utilisateurs.jinja")
+@bp_compte.route('/se_connecter', methods = ["GET","POST"])
+def se_connecter():
+    """Permet a l'utilisateur de se connecter et le rediriger vers la page d'accueil"""
+    if request.method == "POST":
+
+        courriel = request.form.get('courriel')
+        mdp = request.form.get('mdp')
+
+        if not REGEXE_EMAIL.match(courriel) or courriel == "" and mdp == "":
+            return render_template('se_connecter.jinja',class_mdp="is-invalid",
+                                   class_courriel="is-invalid",
+                                   courriel = courriel,titre="Connexion")
+
+        if mdp == "":
+            return render_template('se_connecter.jinja',class_mdp="is-invalid",
+                                   class_courriel="is-valid",courriel = courriel,
+                                     titre="Connexion")
+
+        with bd.creer_connexion() as conn:
+            user = bd.authentification(conn,courriel,utils.hacher_mdp(mdp))
+
+        if user is not None:
+            session.clear()
+            session.permanent = True
+            session['identifiant'] = user["id_utilisateur"]
+            session['courriel'] = user["courriel"]
+            session['est_admin'] = user["est_administrateur"]
+            session['langue'] =  "fr_CA"
+            flash("Connexion réussie.", "success")
+            return redirect(url_for('services.accueil'), code=303)
+        else:
+            flash("Les identifiants saisis sont incorrects.", "error")
+            return render_template('se_connecter.jinja',
+                                   class_mdp="is-invalid",
+                                   class_courriel="is-invalid",
+                                   courriel = courriel,
+                                   titre="Connexion")
+    return render_template('se_connecter.jinja')

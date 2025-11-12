@@ -14,10 +14,9 @@ def create_app():
     app.register_blueprint(bp_compte, url_prefix = '/compte')
     app.register_blueprint(bp_services, url_prefix = '/services')
     app.secret_key = "e468d2eb51a1fcea5386f35e887413d4fd3e091fdacb2ba3df28798e6fff98fa"
-    
     @app.route("/")
     def connexion():
-        return render_template("gestion_compte/se_connnecter.jinja")
+        return render_template("se_connecter.jinja")
     @app.errorhandler(400)
     def bad_request(e):
         """Gère les erreurs 400"""
