@@ -190,10 +190,9 @@ def modifier_service():
 
             if not class_titre and not class_localisation and not class_description and not class_cout:
                 with bd.creer_connexion() as conn:
-                    with conn.get_curseur() as curseur:
-                        bd.update_service(conn, id_service, titre, localisation, description, cout, actif)
-                        flash("Le service a été modifié avec succès.", "success")
-                        return redirect(url_for('services.acceuil'), 303)
+                    bd.update_service(conn, id_service, titre, localisation, description, cout, actif)
+                    flash("Le service a été modifié avec succès.", "success")
+                    return redirect(url_for('services.acceuil'), 303)
 
         return render_template('services/modifier_service.jinja', service = service, class_titre = class_titre, class_localisation = class_localisation,
                            class_description = class_description, class_cout = class_cout)
