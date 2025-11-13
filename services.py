@@ -29,15 +29,6 @@ def get_local():
     """Retourne la locale du cookie (par défaut fr_CA)"""
     return request.cookies.get('langue',BABEL_DEFAULT_LOCALE)
 
-@bp_services.route("/")
-def accueil():
-    """Affiche les  cinq derniers services de particuliers ajoutés selon la date d’ajout, du plus récent au plus ancien"""
-
-    with bd.creer_connexion() as conn:
-        services = bd.get_services(conn)
-
-    return render_template("services/accueil.jinja", services = services)
-
 @bp_services.route("/liste_services")
 def listes_services():
     """Affiche les  cinq derniers services de particuliers ajoutés selon la date d’ajout, du plus récent au plus ancien"""

@@ -81,8 +81,14 @@ def update_service(conn, id_service, titre, localisation, description, cout, act
 def creer_user(conn,user):
     """ Permet d'ajouter un utilisateur dans la bd"""
     with conn.get_curseur() as curseur:
-        curseur.execute("""INSERT INTO `utilisateur` (`nom`,`courriel`, `mdp`, `role`, `credit`)
-                           VALUES (%(nom)s,%(courriel)s, %(mdp)s, %(role)s, %(credit)s)""",user)
+        curseur.execute("""INSERT INTO `utilisateur` (`courriel`, `mdp`, `role`, `credit`)
+                           VALUES (%(courriel)s, %(mdp)s, %(role)s, %(credit)s)""", 
+                           {
+                               "courriel": user["courriel"],
+                               "mdp": user["mdp"],
+                               "role": "user",
+                               "credit": user["credit"]
+                           })
 
 
 def authentification(conn,courriel,mdp):

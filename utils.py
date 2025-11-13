@@ -9,15 +9,9 @@ def hacher_mdp(mdp_en_clair):
     """Prend un mot de passe en clair et lui applique une fonction de hachage"""
     return hashlib.sha512(mdp_en_clair.encode()).hexdigest()
 
-def valider_formulaire(nom, courriel, credit, mdp, mdp_repeat, regex_email, regex_mdp, regex_html):
+def valider_formulaire(courriel, credit, mdp, mdp_repeat, regex_email, regex_mdp, regex_html):
     """permet de valider le formulaire d'inscription"""
     erreurs = {}
-
-    if not nom :
-        erreurs["class_nom"] = "is-invalid"
-    else:
-        erreurs["class_nom"] = "is-valid"
-
 
     if not regex_html.match(courriel) or not regex_email.match(courriel) or not courriel:
         erreurs["class_courriel"] = "is-invalid"

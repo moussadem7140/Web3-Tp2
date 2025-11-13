@@ -8,6 +8,7 @@ from flask import Flask, render_template
 from flask.logging import create_logger
 from compte import bp_compte
 from services import bp_services
+import bd
 def create_app():
     app = Flask(__name__)
     logger = create_logger(app)
@@ -15,8 +16,12 @@ def create_app():
     app.register_blueprint(bp_services, url_prefix = '/services')
     app.secret_key = "e468d2eb51a1fcea5386f35e887413d4fd3e091fdacb2ba3df28798e6fff98fa"
     @app.route("/")
-    def connexion():
-        return render_template("se_connecter.jinja")
+    def accueil():
+        """Page d'accueil"""
+        with bd.creer_connexion() as conn:
+            services = bd.get_services(conn)
+        return render_template("accueil.jinja", services = services)
+    
     @app.errorhandler(400)
     def bad_request(e):
         """Gère les erreurs 400"""
