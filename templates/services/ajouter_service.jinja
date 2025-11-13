@@ -28,7 +28,8 @@
             </div>
             <div class="col-12">
                 <label for="cout" class="form-label">Prix :</label>
-                <input type="number" step="0.01" id="cout" name="cout" class="form-control {{ class_cout }}" value="{{ cout }}">
+                <input type="number" step="0.01" id="cout" name="cout" class="form-control {{ class_cout }}"
+                    value="{{ cout }}">
                 <div class="invalid-feedback">Veuillez entrer un prix valide</div>
             </div>
             <div class="col-12">
@@ -55,13 +56,13 @@
                 </div>
             </div>
             <div class="mb-3">
-            <label for="photo" class="form-label">Photo (nom)</label>
-            <input type="text" class="form-control {{ class_nom_photo }}" id="photo" name="photo" value="{{ photo }}">
-            <div class="invalid-feedback">
-                Veuillez entrer un nom valide pour la photo.
+                <div class="row mb-2">
+                {% if session['identifiant'] == service.id_proprietaire %}
+                <a href="{{ url_for('services.modifier_image', id_service=service.id_service) }}"
+                    class="card-link text-decoration-none"> Modifier image</a>
+                {% endif %}
             </div>
-        </div>
-
+            </div>
             <div class="col-12">
                 <button class="btn btn-success" type="submit">Ajouter</button>
                 <a href="/" class="btn btn-secondary">Annuler</a>
