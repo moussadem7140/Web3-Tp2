@@ -19,17 +19,11 @@
             {% endif %}
             {% endwith %}
 
-            <form method="post" action="{{ url_for('compte.creer_compte') }}" novalidate>
-                <div class="mb-3">
-                    <label class="form-label" for="nom">Nom</label>
-                    <input type="text" class="form-control {{ class_nom }}" name="nom" id="nom" value="{{ nom }}">
-                    <div class="invalid-feedback">Veuillez entrer un nom valide.</div>
-                </div>
-
+            <form method="post" action="{{ url_for('compte.ajouter_utilisateur') }}" novalidate>
                 <div class="mb-3">
                     <label class="form-label" for="courriel">Courriel</label>
                     <input type="email" class="form-control {{ class_courriel }}" name="courriel" id="courriel"
-                        value="{{ courriel }}">
+                        >
                     <div class="invalid-feedback">Vous devez définir un courriel valide sur 50 caractères maximum !</div>
                 </div>
 
