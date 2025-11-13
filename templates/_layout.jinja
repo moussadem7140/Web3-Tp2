@@ -30,14 +30,36 @@
 
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item pe-4">
-                            <a class="nav-link active" aria-current="page" href="{{url_for('services.accueil')}}">Accueil</a>
+                            <a class="nav-link active" aria-current="page" href="/">Accueil</a>
                         </li>
-                        <li class="nav-item pe-4">
-                            <a class="nav-link" href="{{url_for('services.ajouter_service')}}">Ajouter un service</a>
-                        </li>
-                        <li class="nav-item pe-4">
-                            <a class="nav-link" href="{{url_for('services.listes_services')}}">Liste des services</a>
-                        </li>
+                        {% if session['identifiant'] %}
+                            <li class="nav-item pe-4">
+                                <a class="nav-link" href="{{url_for('services.ajouter_service')}}">Ajouter un service</a>
+                            </li>
+                       {%endif%} 
+                        {% if session.identifiant and session.role=="admin"%}
+                            <li class="nav-item pe-4">
+                                <a class="nav-link" href="{{url_for('compte.ajouter_utilisateur')}}">Ajouter un utilisateur</a>
+                            </li>
+                        {%endif%}
+                        {% if not session.identifiant %}
+                            <li class="nav-item pe-4">
+                            <a class="nav-link" href="{{url_for('compte.se_connecter')}}">Se_connecter</a>
+                            </li>
+                        {%endif%}
+                         {% if session.identifiant%}
+                            <li class="nav-item pe-4">
+                                <a class="nav-link" href="{{url_for('compte.se_deconnecter')}}">Se_deconnecter</a>
+                            </li>
+                         {%endif%}
+                         {% if session.identifiant and session.role=="admin"%}
+                             <li class="nav-item pe-4">
+                                <a class="nav-link" href="{{url_for('compte.liste_utilisateurs')}}">Liste des utilisateurs</a>
+                            </li>
+                         {%endif%}
+                         <li class="nav-item pe-4">
+                            <a class="nav-link" href="{{url_for('services.listes_services')}}">Listes des services</a>
+                        </li>                     
                     </ul>
 
                     <div class="d-flex align-items-center ms-lg-3 mt-2 mt-lg-0">

@@ -101,7 +101,8 @@ def authentification(conn,courriel,mdp):
                             "mdp": mdp
                         })
         user = curseur.fetchone()
-        return user
+    return user
+        
 
 def verifie_doublon_courriel(conn, courriel):
     "Retourne true si le courriel est utilisé false si non"
