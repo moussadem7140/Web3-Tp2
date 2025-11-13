@@ -141,3 +141,30 @@ def get_supprimer_utilisateur(conn, id_utilisateur):
             (id_utilisateur,)
         )
         conn.commit()
+
+def supprimer_service(conn, id_service, id_proprietaire):
+    """Supprime un service appartenant à un utilisateur, s’il n’est pas réservé"""
+    with conn.get_curseur() as curseur:
+        curseur.execute("""
+            DELETE FROM services
+            WHERE id_service = %s
+              AND id_proprietaire = %s
+              AND id_service NOT IN (SELECT id_service FROM reservations)
+        """, (id_service, id_proprietaire))
+        conn.commit()
+        return curseur.rowcount > 0
+
+def verifier_disponibilite(conn, id_service, datetime_prestation, date_creation):
+    """Vérifie si un service est disponible à une date/heure donnée"""
+    with conn.get_curseur() as curseur:
+        curseur.execute("""
+            SELECT COUNT(*) AS total
+            FROM reservations
+            WHERE id_service = %s
+              AND date_creation = %s
+              AND datetime_prestation = %s
+        """, (id_service, date_creation, datetime_prestation))
+        resultat = curseur.fetchone()
+        return resultat["total"] == 0
+
+

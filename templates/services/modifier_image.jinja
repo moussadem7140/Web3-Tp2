@@ -1,0 +1,22 @@
+{% extends "_layout.jinja" %}
+
+{% block contenu %}
+<div class="container mt-4">
+  <h2>Modifier l'image</h2>
+<div class="card mb-4">
+  <div class="card-header fw-bold">{{ service.titre }}</div>
+  <img src="{{ service.image_path }}" class="card-img-top m-2" alt="Image actuelle" width="400" height="500">
+
+  <div class="card-body">
+    <form method="POST" action="{{url_for('services.modifier_image',id_service=service.id_service)}}" enctype="multipart/form-data" novalidate>
+      <div class="mb-3">
+        <label for="nouvelle_image" class="form-label">Nouvelle image *</label>
+        <input type="file" name="nouvelle_image" id="nouvelle_image" accept="image/*" class="form-control {{class_file}}">
+        <div class="invalid-feedback">Doit contenir une image</div>
+      </div>
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </form>
+  </div>
+</div>
+</div>
+{% endblock %}
