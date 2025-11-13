@@ -50,9 +50,9 @@ def creer_compte():
                     "Cet utilisateur est déjà enregistré. "
                     "Essayez de vous connecter ou utilisez un autre courriel.", "error"
                 )
-                return redirect(url_for("gestion_compte.ajouter_utilisateur"), code=303)
+                return redirect(url_for("compte.ajouter_utilisateur"), code=303)
         return redirect("/", code=303)
-    return redirect("gestion_compte/liste_utilisateurs.jinja")
+    return redirect("compte/liste_utilisateurs.jinja")
 
 
 @bp_compte.route('/se_connecter', methods = ["GET","POST"])
