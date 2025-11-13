@@ -113,16 +113,16 @@ def get_liste_compte(conn):
             user =curseur.fetchall()
             return user
 
-def ajouter_utilisateur(conn, nom, courriel, hashed, credit, role):
+def ajouter_utilisateur(conn, courriel, hashed, credit, role):
     """Ajoute un utilisateur dans la base de données"""
     with conn.get_curseur() as curseur:
         if role == 'admin':
             curseur.execute(
                 """
-                INSERT INTO utilisateur (nom, courriel, mdp, role, credit)
+                INSERT INTO utilisateur (courriel, mdp, role, credit)
                 VALUES (%s, %s, %s, %s, %s)
                 """,
-                (nom, courriel, hashed, 'user', credit)
+                (courriel, hashed, credit, 'user')
             )
             conn.commit()
 

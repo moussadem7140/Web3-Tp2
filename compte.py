@@ -11,7 +11,7 @@ REGEXE_EMAIL = re.compile(r"^(?!.*\.\.)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]
 REGEX_MDP = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$")
 REGEX_HTML = re.compile(r"<[^>]+>")
 
-@bp_compte.route('/creer_compte', methods = ["GET","POST"])
+@bp_compte.route('/ajouter_utilisateur', methods = ["GET","POST"])
 def creer_compte():
     """Route vers la page de création du compte si GET si non Creation du compte si POST"""
 
@@ -50,9 +50,9 @@ def creer_compte():
                     "Cet utilisateur est déjà enregistré. "
                     "Essayez de vous connecter ou utilisez un autre courriel.", "error"
                 )
-                return redirect(url_for("compte.creer_compte"), code=303)
+                return redirect(url_for("gestion_compte.ajouter_utilisateur"), code=303)
         return redirect("/", code=303)
-    return redirect("comptes/liste_utilisateurs.jinja")
+    return redirect("gestion_compte/liste_utilisateurs.jinja")
 
 
 @bp_compte.route('/se_connecter', methods = ["GET","POST"])
@@ -94,24 +94,27 @@ def se_connecter():
                                    titre="Connexion")
     return render_template('se_connecter.jinja')
 
+@bp_compte.route('/liste_utilisateurs')
+def liste_utilisateurs():
+    """Afficher la liste """
+    if 'role' not in session or session['role'] != 'admin':
+        flash("Accès réservé à l’administrateur.")
+
+    with bd.creer_connexion() as conn:
+        utilisateurs = bd.get_liste_compte(conn)
+    return render_template('liste_utilisateurs.jinja', utilisateurs=utilisateurs)
+
+
 @bp_compte.route("/supprimer_compte/<int:id_utilisateur>", methods=["POST"])
 def supprimer_compte(id_utilisateur):
     """Permet à l’administrateur de supprimer un compte"""
-
-    if "utilisateur" not in session:
-        flash("Vous devez être connecté pour effectuer cette action.")
-        return redirect("/comptes/se_connecter")
-
     if session.get('role') != 'admin':
         flash("Accès réservé à l’administrateur.")
         return redirect("/")
 
-    try:
-        with bd.creer_connexion() as conn:
-            bd.get_supprimer_utilisateur(conn, id_utilisateur)
-            flash("Le compte a été supprimé avec succès.", "success")
-    except Exception:
-        flash("Erreur serveur. Réessayez plus tard.")
+    with bd.creer_connexion() as conn:
+        bd.get_supprimer_utilisateur(conn, id_utilisateur)
+    flash("Utilisateur supprimé avec succès.", "success")
 
-    return redirect(url_for("comptes.liste_utilisateurs"))
+    return redirect(url_for("liste_utilisateurs"))
 

@@ -1,32 +1,5 @@
 {% extends "_layout.jinja" %}
-{%block entête%}
 
-{%endblock%}
 {% block contenu %}
-<div class="container">
-    <div class="card p-3 bg-secondary">
-        <div class="card-body">
-            <h4 class="card-title text-center">Formulaire de connexion</h4>
-            <form method="post" action="{{url_for('compte.se_connecter')}}" novalidate>
-                <div class="row">
-                    <div class="col-md-12">
-                        <label class="form-label" for="courriel">Courriel</label>
-                        <input type="email" class="form-control {{class_courriel}}" name="courriel" id="courriel" value="{{courriel}}">
-                        <div class="invalid-feedback">L'adresse courriel ne peut pas être vide et doit être dans un format valide.</div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <label class="form-label" for="mdp">Mot de passe</label>
-                        <input type="password" class="form-control {{class_mdp}}" name="mdp" id="mdp">
-                         <div class="invalid-feedback">Veuillez saisir un mot de passe. Ce champ est obligatoire.</div>
-                    </div>
-                </div>
-                <div class="text-center mt-3">
-                    <button type="submit" class="btn btn-primary w-25">Valider</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+
 {% endblock %}
