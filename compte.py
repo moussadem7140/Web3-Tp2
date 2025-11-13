@@ -16,19 +16,19 @@ def creer_compte():
     """Route vers la page de création du compte si GET si non Creation du compte si POST"""
 
     if request.method == "POST":
-        nom = request.form.get('nom', "").strip()
         courriel = request.form.get('courriel', '').strip()
         credit = request.form.get('credit', '').strip()
         mdp = request.form.get('mdp')
         mdp_repeat = request.form.get('mdp_repeat')
 
-        erreurs = utils.valider_formulaire(nom, courriel, credit, mdp, mdp_repeat, REGEXE_EMAIL, REGEX_MDP, REGEX_HTML)
+        erreurs = utils.valider_formulaire(courriel, credit, mdp, mdp_repeat, REGEXE_EMAIL, REGEX_MDP, REGEX_HTML)
         if "is-invalid" in erreurs.values():
             return render_template(
                 'compte/creer_compte.jinja',
-                nom = nom,
                 courriel=courriel,
                 credit=credit,
+                mdp = mdp,
+                mdp_repeat = mdp_repeat,
                 titre="Création de compte",
                 class_nom=erreurs.get("class_nom", ""),
                 class_courriel=erreurs.get("class_courriel", ""),
@@ -38,10 +38,8 @@ def creer_compte():
 
         with bd.creer_connexion() as conn:
             user_doublon = bd.verifie_doublon_courriel(conn,courriel)
-
             if user_doublon is None:
                 user = {
-                    "nom": nom,
                     "courriel": courriel,
                     "mdp": utils.hacher_mdp(mdp),
                     "credit": credit,
@@ -53,10 +51,10 @@ def creer_compte():
                     "Essayez de vous connecter ou utilisez un autre courriel.", "error"
                 )
                 return redirect(url_for("compte.creer_compte"), code=303)
-
         return redirect("/", code=303)
-
     return redirect("comptes/liste_utilisateurs.jinja")
+
+
 @bp_compte.route('/se_connecter', methods = ["GET","POST"])
 def se_connecter():
     """Permet a l'utilisateur de se connecter et le rediriger vers la page d'accueil"""
@@ -95,3 +93,25 @@ def se_connecter():
                                    courriel = courriel,
                                    titre="Connexion")
     return render_template('se_connecter.jinja')
+
+@bp_compte.route("/supprimer_compte/<int:id_utilisateur>", methods=["POST"])
+def supprimer_compte(id_utilisateur):
+    """Permet à l’administrateur de supprimer un compte"""
+
+    if "utilisateur" not in session:
+        flash("Vous devez être connecté pour effectuer cette action.")
+        return redirect("/comptes/se_connecter")
+
+    if session.get('role') != 'admin':
+        flash("Accès réservé à l’administrateur.")
+        return redirect("/")
+
+    try:
+        with bd.creer_connexion() as conn:
+            bd.get_supprimer_utilisateur(conn, id_utilisateur)
+            flash("Le compte a été supprimé avec succès.", "success")
+    except Exception:
+        flash("Erreur serveur. Réessayez plus tard.")
+
+    return redirect(url_for("comptes.liste_utilisateurs"))
+
