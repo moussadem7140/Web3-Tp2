@@ -2,6 +2,7 @@
 Une application Flask d'échange de service
 """
 import re
+import os
 import mysql.connector
 from mysql.connector import Error
 from flask import Flask, render_template
@@ -14,7 +15,9 @@ def create_app():
     logger = create_logger(app)
     app.register_blueprint(bp_compte, url_prefix = '/compte')
     app.register_blueprint(bp_services, url_prefix = '/services')
+    app.register_blueprint(bp_reservation, url_prefix = '/reservation')
     app.secret_key = "e468d2eb51a1fcea5386f35e887413d4fd3e091fdacb2ba3df28798e6fff98fa"
+
     @app.route("/")
     def accueil():
         """Page d'accueil"""

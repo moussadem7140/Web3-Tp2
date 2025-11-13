@@ -27,6 +27,8 @@ def ajouter_utilisateur():
                 'gestion_compte/ajouter_utilisateur.jinja',
                 courriel=courriel,
                 credit=credit,
+                mdp = mdp,
+                mdp_repeat = mdp_repeat,
                 titre="Création de compte",
                 class_nom=erreurs.get("class_nom", ""),
                 class_courriel=erreurs.get("class_courriel", ""),
@@ -36,7 +38,6 @@ def ajouter_utilisateur():
 
         with bd.creer_connexion() as conn:
             user_doublon = bd.verifie_doublon_courriel(conn,courriel)
-
             if user_doublon is None:
                 user = {
                     "courriel": courriel,

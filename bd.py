@@ -112,3 +112,32 @@ def verifie_doublon_courriel(conn, courriel):
         user = curseur.fetchone()
 
         return user
+
+def get_liste_compte(conn):
+    """Tous les services"""
+    with conn.get_curseur() as curseur:
+            curseur.execute('''SELECT id_utilisateur, courriel, role, credit FROM utilisateur''')
+            user =curseur.fetchall()
+            return user
+
+def ajouter_utilisateur(conn, courriel, hashed, credit, role):
+    """Ajoute un utilisateur dans la base de données"""
+    with conn.get_curseur() as curseur:
+        if role == 'admin':
+            curseur.execute(
+                """
+                INSERT INTO utilisateur (courriel, mdp, role, credit)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                (courriel, hashed, credit, 'user')
+            )
+            conn.commit()
+
+def get_supprimer_utilisateur(conn, id_utilisateur):
+    """Supprime un utilisateur de la base de données (admin seulement)."""
+    with conn.get_curseur() as curseur:
+        curseur.execute(
+            "DELETE FROM utilisateur WHERE id_utilisateur = %s",
+            (id_utilisateur,)
+        )
+        conn.commit()

@@ -1,0 +1,52 @@
+{% extends "_layout.jinja" %}
+
+{% block contenu %}
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Gestion des utilisateurs</h2>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <table class="table table-striped table-bordered text-center align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>Courriel</th>
+        <th>credit</th>
+        <th>Rôle</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in utilisateur %}
+      <tr>
+        <td>{{ u.courriel }}</td>
+        <td>{{ u.credit }}</td>
+        <td>{{ u.role }}</td>
+        <td>
+          {% if session.role == 'admin' %}
+          <form method="post" action="{{ url_for('supprimer_utilisateur', id_utilisateur=u.id_utilisateur) }}"
+            onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
+            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+          </form>
+          {% else %}
+          <span class="text-muted">Non autorisé</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="text-center mt-4">
+    <a href="{{ url_for('ajouter_utilisateur') }}" class="btn btn-success">Ajouter un utilisateur</a>
+    <a href="{{ url_for('accueil') }}" class="btn btn-secondary">Retour à l’accueil</a>
+  </div>
+</div>
+{% endblock %}
