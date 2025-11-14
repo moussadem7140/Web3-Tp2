@@ -5,10 +5,9 @@
 
 {% block contenu %}
 <div class="card container mt-4">
-    <img src="/static/images/default.png" width="400" height="300" class="card-img-top" alt="{{ titre }}">
     <div class="card-body">
 
-        <form class="row g-3" method="POST" action="{{url_for('services.ajouter_service'}}" novalidate="novalidate">
+        <form class="row g-3" method="POST" action="{{url_for('services.ajouter_service')}}" novalidate="novalidate" enctype="multipart/form-data">
             <div class="col-12">
                 <label for="titre" class="form-label">Titre :</label>
                 <input type="text" id="titre" name="titre" class="form-control {{ class_titre }}" value="{{ titre }}">
@@ -56,12 +55,9 @@
                 </div>
             </div>
             <div class="mb-3">
-                <div class="row mb-2">
-                {% if session['identifiant'] == service.id_proprietaire %}
-                <a href="{{ url_for('services.modifier_image', id_service=service.id_service) }}"
-                    class="card-link text-decoration-none"> Modifier image</a>
-                {% endif %}
-            </div>
+                <label for="image" class="form-label">Image du service :</label>
+                <input class="form-control {{ class_image }}" type="file" id="image" name="image">
+                <div class="invalid-feedback">Veuillez sélectionner une image valide.
             </div>
             <div class="col-12">
                 <button class="btn btn-success" type="submit">Ajouter</button>

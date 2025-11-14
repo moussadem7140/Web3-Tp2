@@ -6,10 +6,10 @@
 {% block contenu %}
 
 <div class="card container shadow mt-4">
-    <img src="/static/images/default.png" width="400" height="300" class="card-img-top" alt="{{ service.titre }}">
+    <img src="{{service.photo}}" width="400" height="300" class="card-img-top" alt="{{ service.titre }}">
     <div class="card-body">
         <form method="POST" action="{{url_for('services.modifier_service', id_service=service.id_service)}}" class="row g-3"
-            novalidate="novalidate">
+            novalidate="novalidate" enctype="multipart/form-data">
             <input type="hidden" name="id_service" value="{{ service.id_service }}">
             <div class="col-12">
                 <label for="titre" class="form-label">Titre :</label>
@@ -57,7 +57,11 @@
                     </label>
                 </div>
             </div>
-
+            <div class="mb-3">
+                <label for="image" class="form-label">Image du service :</label>
+                <input class="form-control {{ class_photo }}" type="file" id="image" name="image">
+                <div class="invalid-feedback">Veuillez sélectionner une image valide.</div>
+            </div>
             <div class="col-12">
                 <button type="submit" class="btn btn-success">Enregistrer</button>
                 <a href=" /service/{{service.id_service}}" class="btn btn-secondary">Annuler</a>

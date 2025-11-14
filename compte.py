@@ -55,7 +55,7 @@ def ajouter_utilisateur():
 
         return redirect(url_for('accueil'), code=303)
 
-    return render_template("gestion_compte/ajouter_utilisateur.jinja")
+    return render_template("compte/ajouter_utilisateur.jinja")
 @bp_compte.route('/se_connecter', methods = ["GET","POST"])
 def se_connecter():
     """Permet a l'utilisateur de se connecter et le rediriger vers la page d'accueil"""
@@ -76,9 +76,21 @@ def se_connecter():
                 return redirect(url_for('accueil'), code=303)
             else:
                 flash("Les identifiants saisis sont incorrects.", "error")
-                return render_template('services/se_connecter.jinja',
+                return render_template('compte/se_connecter.jinja',
                                     class_mdp="is-invalid",
                                     class_courriel="is-invalid",
                                     courriel = courriel,
                                     titre="Connexion")
-    return render_template('services/se_connecter.jinja')
+    return render_template('compte/se_connecter.jinja')
+@bp_compte.route('/se_deconnecter')
+def se_deconnecter():
+    """Permet a l'utilisateur de se deconnecter et le rediriger vers la page d'accueil"""
+    session.clear()
+    flash("Déconnexion réussie.", "success")
+    return redirect(url_for('accueil'), code=303)
+@bp_compte.route('/liste_utilisateurs')
+def liste_utilisateurs():
+    """Permet d'afficher la liste des utilisateurs"""
+    with bd.creer_connexion() as conn:
+        utilisateurs = bd.get_liste_compte(conn)
+    return render_template('compte/liste_utilisateurs.jinja', utilisateurs=utilisateurs)

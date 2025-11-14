@@ -12,12 +12,22 @@ from services import bp_services
 import bd
 def create_app():
     app = Flask(__name__)
+    app.secret_key = "e468d2eb51a1fcea5386f35e887413d4fd3e091fdacb2ba3df28798e6fff98fa"
+    # Liste des sous-répertoires vers "ajouts"
+    app.config['MORCEAUX_VERS_AJOUTS'] = ["static", "images", "ajouts"]
+
+# Pour donner static/images/ajouts". Assurez-vous que ce dossier existe !
+    app.config['ROUTE_VERS_AJOUTS'] = "/".join(app.config['MORCEAUX_VERS_AJOUTS'])
+
+
+    app.config['CHEMIN_VERS_AJOUTS'] = os.path.join(
+        app.root_path,
+        *app.config['MORCEAUX_VERS_AJOUTS']
+    )
     logger = create_logger(app)
     app.register_blueprint(bp_compte, url_prefix = '/compte')
     app.register_blueprint(bp_services, url_prefix = '/services')
-    app.register_blueprint(bp_reservation, url_prefix = '/reservation')
-    app.secret_key = "e468d2eb51a1fcea5386f35e887413d4fd3e091fdacb2ba3df28798e6fff98fa"
-
+    
     @app.route("/")
     def accueil():
         """Page d'accueil"""

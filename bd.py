@@ -44,17 +44,17 @@ def get_services(conn, tous = False):
         if tous:
             curseur.execute('''SELECT s.id_service, s.titre, s.localisation, s.date_creation,s.photo, c.nom_categorie
                             FROM services s JOIN categories c ON s.id_categorie = c.id_categorie
-                                 ORDER By s.date_creation''')
+                                 ORDER By s.date_creation  Desc''')
             return curseur.fetchall()
         else:
             curseur.execute('''SELECT s.id_service, s.titre, s.localisation, s.date_creation, s.photo, c.nom_categorie
                     FROM services s JOIN categories c ON s.id_categorie = c.id_categorie
-                    WHERE s.actif = 1 ORDER BY s.date_creation limit 5''')
+                    WHERE s.actif = 1 ORDER BY s.date_creation DESC LIMIT 5''')
             return curseur.fetchall()
 
 def get_service(conn, id_service):
        with conn.get_curseur() as curseur:
-                curseur.execute('''SELECT s.id_service, s.titre, s.localisation, s.description, s.cout, s.date_creation, s.actif, c.nom_categorie
+                curseur.execute('''SELECT s.id_service, s.photo, s.id_utilisateur, s.titre, s.localisation, s.description, s.cout, s.date_creation, s.actif, c.nom_categorie
                             FROM services s JOIN categories c ON s.id_categorie = c.id_categorie
                             WHERE s.id_service = %(id)s''',
                 {
@@ -64,19 +64,20 @@ def get_service(conn, id_service):
 
 def add_service(conn, service):
         with conn.get_curseur() as curseur:
-                curseur.execute('''INSERT INTO services(titre, description,localisation, actif, cout, id_categorie, date_creation, photo)
-                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)''', (service['titre'],service['description'], service['localisation'], service['actif'], service['cout'], service['id_categorie'], service['date_creation'], service['photo']))
+                curseur.execute('''INSERT INTO services(titre, description,localisation, actif, cout, id_categorie, date_creation, photo, id_utilisateur)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)''', (service['titre'], service['description'], service['localisation'], service['actif'], service['cout'], service['id_categorie'], service['date_creation'], service['photo'], service['id_utilisateur']))
 
 def get_categories(conn):
       with conn.get_curseur() as curseur:
             curseur.execute("""
             SELECT id_categorie, nom_categorie FROM categories """)
             return curseur.fetchall()
-def update_service(conn, id_service, titre, localisation, description, cout, actif):
+      
+def update_service(conn, id_service, titre, localisation, description, cout, actif, photo):
         with conn.get_curseur() as curseur:
                 curseur.execute('''UPDATE services
-                            SET titre = %s, localisation = %s, description = %s, cout =%s, actif = %s
-                            WHERE id_service = %s''', (titre, localisation, description, cout, actif, id_service))
+                            SET titre = %s, localisation = %s, description = %s, cout =%s, actif = %s, photo = %s
+                            WHERE id_service = %s''', (titre, localisation, description, cout, actif, photo, id_service))
 
 def creer_user(conn,user):
     """ Permet d'ajouter un utilisateur dans la bd"""

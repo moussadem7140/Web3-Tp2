@@ -7,7 +7,6 @@ from mysql.connector import Error
 from babel import dates ,numbers
 import bd
 bp_services = Blueprint('services', __name__)
-
 balises_html = re.compile(r'<(.*)>.*?|<(.*) />')
 langues_disponibles = ["en_CA", "fr_CA"]
 BABEL_DEFAULT_LOCALE = "fr_CA"
@@ -84,7 +83,13 @@ def ajouter_service():
                 cout = request.form.get("cout", "0").strip()
                 actif = int(request.form.get("actif", 1))
                 id_categorie = request.form.get("id_categorie", default="")
-                photo = request.form.get("photo", "").strip()
+                photo = request.files['image']
+                nom_image = "image_" +titre+ ".png"
+                chemin_complet = os.path.join(
+                    app.config['CHEMIN_VERS_AJOUTS'], nom_image
+                )
+                photo.save(chemin_complet)
+                photo = "/" + app.config['ROUTE_VERS_AJOUTS'] + "/" + nom_image
                 service={
                     'titre': titre,
                     'localisation': localisation,
@@ -93,7 +98,7 @@ def ajouter_service():
                     'actif': actif,
                     'id_categorie': id_categorie,
                     'photo': photo,
-                    'id_utilisateur': 1,
+                    'id_utilisateur': session.get('identifiant'),
                     'date_creation': datetime.now()
                 }
                 if id_categorie:
@@ -132,9 +137,9 @@ def ajouter_service():
                 if not class_titre and not class_localisation and not class_description and not class_categorie and not class_cout and not class_nom_photo:
                     bd.add_service(conn, service)
                     flash("Le service a été ajouté avec succès.", "success")
-                    return redirect(url_for('services.acceuil'), code= 303)
+                    return redirect(url_for('accueil'), code= 303)
 
-    return render_template('ajouter_service.jinja', class_titre = class_titre, class_localisation = class_localisation,class_description= class_description,
+    return render_template('services/ajouter_service.jinja', class_titre = class_titre, class_localisation = class_localisation,class_description= class_description,
                            class_cout= class_cout, class_nom_photo= class_nom_photo,categories= categorie, titre = titre, localisation=localisation,
                            description=description, cout = cout, actif = actif, id_categorie= id_categorie)
 
@@ -160,12 +165,24 @@ def modifier_service():
         class_localisation = ''
         class_description = ''
         class_cout = ''
+        class_photo = ''
+        class_categorie =''
 
         if request.method == 'POST':
             titre = request.form.get("titre", "").strip()
             localisation = request.form.get("localisation", "").strip()
             description = request.form.get("description", "").strip()
             cout = request.form.get("cout", "").strip()
+            photo = request.files['image']
+            if not photo :
+                class_photo = 'is-invalid'  
+            nom_image = "image_" +titre+ ".png"
+            chemin_complet = os.path.join(
+                app.config['CHEMIN_VERS_AJOUTS'], nom_image
+            )
+            photo.save(chemin_complet)
+            photo = "/" + app.config['ROUTE_VERS_AJOUTS'] + "/" + nom_image
+    
             try:
                 actif = int(request.form.getlist('actif')[-1])
             except (ValueError, IndexError):
@@ -187,15 +204,15 @@ def modifier_service():
                     class_cout = 'is-invalid'
             except ValueError:
                 class_cout = 'is-invalid'
-
-            if not class_titre and not class_localisation and not class_description and not class_cout:
+            
+            if not class_titre and not class_localisation and not class_description and not class_cout and not class_photo:
                 with bd.creer_connexion() as conn:
-                    bd.update_service(conn, id_service, titre, localisation, description, cout, actif)
+                    bd.update_service(conn, id_service, titre, localisation, description, cout, actif, photo)
                     flash("Le service a été modifié avec succès.", "success")
-                    return redirect(url_for('services.acceuil'), 303)
+                    return redirect(url_for('accueil'), 303)
 
         return render_template('services/modifier_service.jinja', service = service, class_titre = class_titre, class_localisation = class_localisation,
-                           class_description = class_description, class_cout = class_cout)
+                           class_description = class_description, class_cout = class_cout, class_photo= class_photo, class_categorie= class_categorie)
     except Error :
         abort(500, "Erreur en lien avec la base de données")
 
