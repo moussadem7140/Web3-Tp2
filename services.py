@@ -12,21 +12,16 @@ langues_disponibles = ["en_CA", "fr_CA"]
 BABEL_DEFAULT_LOCALE = "fr_CA"
 devise ={
     'fr_CA':'CAD',
-    'en_CA':'CAD'
+    'en_CA':'$'
 }
-@bp_services.route("/changer_locale")
-def changer_locale():
+@bp_services.route("/changer_locale/<locale>")
+def changer_locale(locale):
     """Permet de changer la langue de la page"""
-    locale = request.args.get("locale", BABEL_DEFAULT_LOCALE)
-    if locale not in langues_disponibles:
-        return redirect(url_for('services.accueil'))
-    reponse = make_response(redirect(request.referrer or '/'))
-    reponse.set_cookie("langue", locale)
-    return reponse
-
+    session['langue'] = locale
+    return redirect(url_for('accueil'))
 def get_local():
     """Retourne la locale du cookie (par défaut fr_CA)"""
-    return request.cookies.get('langue',BABEL_DEFAULT_LOCALE)
+    return session.get('langue',BABEL_DEFAULT_LOCALE)
 
 @bp_services.route("/liste_services")
 def listes_services():
@@ -53,6 +48,8 @@ def details_service(id_service):
             service['date_creation']=dates.format_datetime(service['date_creation'],locale=locale)
         if service.get('cout') is not None:
             service['cout']=numbers.format_currency(service['cout'],devise[locale],locale=locale)
+        if 'identifiant' in session:
+            service['est_proprietaire'] = bd.verifier_proprietaire_service(conn, id_service, session.get('identifiant')) 
 
         return render_template("services/service.jinja", service = service)
 
@@ -61,6 +58,9 @@ def details_service(id_service):
     
 @bp_services.route("/ajouter_service", methods=['GET', 'POST'])
 def ajouter_service():
+    if not session.get('identifiant'):
+        flash("Vous devez être connecté pour ajouter un service.", "error")
+        abort(401)
     """Permet d'ajouter un service"""
 
     class_titre = ''
@@ -151,6 +151,13 @@ def ajouter_service():
 
 @bp_services.route("/modifier_service/<int:id_service>", methods= ['GET', 'POST'])
 def modifier_service(id_service):
+    if not session.get('identifiant'):
+        flash("Vous devez être connecté pour modifier un service.", "error")
+        abort(401)
+    with bd.creer_connexion() as conn:
+        if not bd.verifier_proprietaire_service(conn, id_service, session.get('identifiant')) and session.get('role')!="admin":
+            flash("Vous n'avez pas la permission de modifier ce service.", "error")
+            abort(403)
     """Permet de modifier un service existant"""
     locale = get_local()
 

@@ -34,6 +34,7 @@
                     {% endif %}
                 </p>
             </div>
+            {%if ('identifiant' in session and service.est_proprietaire) or session.role=="admin"%}
             <div class="col-md-4">
                 <a href="{{url_for('services.modifier_service', id_service=service.id_service)}}" class="btn btn-primary">Modifier</a>
             </div>
