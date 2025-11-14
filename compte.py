@@ -1,6 +1,6 @@
 """Gestion du bluprint de compte utilisateur"""
 import re
-from flask import Blueprint, request, render_template, redirect, flash, session, url_for
+from flask import Blueprint, request, render_template, redirect, flash, session, url_for, abort, current_app as app
 import utils
 import bd
 
@@ -18,13 +18,13 @@ def ajouter_utilisateur():
     if request.method == "POST":
         courriel = request.form.get('courriel', '').strip()
         credit = request.form.get('credit', '').strip()
-        mdp = request.form.get('mdp')
-        mdp_repeat = request.form.get('mdp_repeat')
+        mdp = request.form.get('mdp').strip()
+        mdp_repeat = request.form.get('mdp_repeat').strip()
 
         erreurs = utils.valider_formulaire(courriel, credit, mdp, mdp_repeat, REGEXE_EMAIL, REGEX_MDP, REGEX_HTML)
         if "is-invalid" in erreurs.values():
             return render_template(
-                'gestion_compte/ajouter_utilisateur.jinja',
+                'compte/ajouter_utilisateur.jinja',
                 courriel=courriel,
                 credit=credit,
                 mdp = mdp,
@@ -93,4 +93,16 @@ def liste_utilisateurs():
     """Permet d'afficher la liste des utilisateurs"""
     with bd.creer_connexion() as conn:
         utilisateurs = bd.get_liste_compte(conn)
+        flash("Liste des utilisateurs chargée avec succès.", "success")
     return render_template('compte/liste_utilisateurs.jinja', utilisateurs=utilisateurs)
+@bp_compte.route('/supprimer_utilisateur/<int:id_utilisateur>', methods=['POST'])
+def supprimer_utilisateur(id_utilisateur):
+    """Permet a un admin de supprimer un utilisateur"""
+    if session.get('role') != 'admin':
+        flash("Vous n'avez pas la permission de faire cette action.", "error")
+        abort(403)
+    with bd.creer_connexion() as conn:
+        bd.get_supprimer_utilisateur(conn, id_utilisateur)
+        flash("Utilisateur supprimé avec succès.", "success")
+
+    return redirect(url_for('compte.liste_utilisateurs'), code=303)

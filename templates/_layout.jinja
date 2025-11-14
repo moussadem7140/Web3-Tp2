@@ -12,7 +12,6 @@
 </head>
 
 <body>
-{% block entête %}
     <header>
         <nav class="cc-navbar navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
@@ -70,10 +69,7 @@
                 </div>
             </div>
         </nav>
-    {% endblock%}
     </header>
-
-
     <main>
         <h2>{{ titre }}</h2>
         {% with messages = get_flashed_messages(with_categories=True) %}
