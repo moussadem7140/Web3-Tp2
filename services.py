@@ -35,22 +35,22 @@ def listes_services():
                     service['est_proprietaire'] = False
     return render_template("services/listes_services.jinja", services = services)
 
-@bp_services.route("details_services/<int:id_service>")
+@bp_services.route("details_service/<int:id_service>")
 def details_service(id_service):
     """Affiche les détails d'un service"""
     locale = get_local()
     try :
         with bd.creer_connexion() as conn:
             service = bd.get_service(conn, id_service)
-        if service is None:
-            abort(404, "Jeu non trouvé")
-        if service.get('date_creation'):
-            service['date_creation']=dates.format_datetime(service['date_creation'],locale=locale)
-        if service.get('cout') is not None:
-            service['cout']=numbers.format_currency(service['cout'],devise[locale],locale=locale)
-        if 'identifiant' in session:
-            service['est_proprietaire'] = bd.verifier_proprietaire_service(conn, id_service, session.get('identifiant')) 
-
+            if service is None:
+                abort(404, "Jeu non trouvé")
+            if service.get('date_creation'):
+                service['date_creation']=dates.format_datetime(service['date_creation'],locale=locale)
+            if service.get('cout') is not None:
+                service['cout']=numbers.format_currency(service['cout'],devise[locale],locale=locale)
+            if 'identifiant' in session:
+                service["est_proprietaire"]= bd.verifier_proprietaire_service(conn, id_service, session.get('identifiant'))
+                       
         return render_template("services/service.jinja", service = service)
 
     except Error:
