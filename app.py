@@ -5,7 +5,7 @@ import re
 import os
 import mysql.connector
 from mysql.connector import Error
-from flask import Flask, render_template
+from flask import Flask, render_template, session
 from flask.logging import create_logger
 from compte import bp_compte
 from services import bp_services
@@ -27,12 +27,18 @@ def create_app():
     logger = create_logger(app)
     app.register_blueprint(bp_compte, url_prefix = '/compte')
     app.register_blueprint(bp_services, url_prefix = '/services')
-    
+
     @app.route("/")
     def accueil():
         """Page d'accueil"""
         with bd.creer_connexion() as conn:
             services = bd.get_services(conn)
+            if 'identifiant' in session:
+                for service in services:
+                    if bd.verifier_proprietaire_service(conn, service['id_service'], session.get('identifiant')):
+                        service['est_proprietaire'] = True
+                    else:
+                        service['est_proprietaire'] = False
         return render_template("accueil.jinja", services = services)
     
     @app.errorhandler(400)

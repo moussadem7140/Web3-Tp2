@@ -10,14 +10,20 @@
         {% for service in services %}
         <div class="col-md-4 mb-3">
             <div class="card shadow-sm">
-                <img src="{{service.photo}}" class="card-img-top" alt="Image par défaut">
+                <img src="{{service.photo}}" class="card-img-top mw-100" alt="Image par défaut">
                 <div class="card-body">
                     <h5 class="card-title"> {{ service.titre }}</h5>
                     <p class="card-text">
                         <strong>Catégorie :</strong> {{ service.nom_categorie }} <br>
                         <strong>Localisation :</strong> {{ service.localisation }}
                     </p>
-                    <a href="{{url_for('services.details_service', id_service=service.id_service)}}" class="btn btn-primary">Voir détails</a>
+                     <a href="{{url_for('services.details_service', id_service=service.id_service)}}" class="btn btn-primary m-2">Voir détails</a>
+                    {% if session.identifiant and not service.est_proprietaire %}
+                        <a href="{{url_for('services.reserver', id_service=service.id_service)}}" class="btn btn-primary m-2">Reserver</a>
+                    {% endif %}
+                    {% if session.identifiant and (service.est_proprietaireproprietaire or session.role=="admin") %}
+                        <a href="{{url_for('services.supprimer', id_service=service.id_service)}}" class="btn btn-primary m-2">Supprimer</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -1,0 +1,29 @@
+{% extends "_layout.jinja" %}
+{% block contenu %}
+<div class="container">
+    <div class="card p-3 bg-secondary">
+        <div class="card-body">
+            <h4 class="card-title text-center">Formulaire de reservation</h4>
+            <form method="post" action="{{url_for('services.reserver', id_service= id_service)}}" novalidate>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="form-label" for="courriel">date</label>
+                        <input type="date" class="form-control {{class_date}}" name="date" id="date" value="{{date}}">
+                        <div class="invalid-feedback">le service n'est pas valide a cette date et heure</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="form-label" for="mdp">Heure</label>
+                        <input type="time" class="form-control {{class_heure}}" name="heure" id="heure">
+                        <div class="invalid-feedback">le service n'est pas valide a cette date et heure</div>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary w-25">Valider</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

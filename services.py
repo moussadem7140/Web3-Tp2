@@ -30,9 +30,14 @@ def get_local():
 
 @bp_services.route("/liste_services")
 def listes_services():
-    """Affiche les  cinq derniers services de particuliers ajoutés selon la date d’ajout, du plus récent au plus ancien"""
     with bd.creer_connexion() as conn:
         services = bd.get_services(conn, tous=True)
+        if 'identifiant' in session:
+            for service in services:
+                if bd.verifier_proprietaire_service(conn, service['id_service'], session.get('identifiant')):
+                    service['est_proprietaire'] = True
+                else:
+                    service['est_proprietaire'] = False
     return render_template("services/listes_services.jinja", services = services)
 
 @bp_services.route("details_services/<int:id_service>")
@@ -144,11 +149,10 @@ def ajouter_service():
                            description=description, cout = cout, actif = actif, id_categorie= id_categorie)
 
 
-@bp_services.route("/modifier_service", methods= ['GET', 'POST'])
-def modifier_service():
+@bp_services.route("/modifier_service/<int:id_service>", methods= ['GET', 'POST'])
+def modifier_service(id_service):
     """Permet de modifier un service existant"""
     locale = get_local()
-    id_service = request.args.get("id_service", type=int)
 
     if not id_service:
         abort(400, "id_service du service manque dans l'URL")
@@ -217,4 +221,53 @@ def modifier_service():
         abort(500, "Erreur en lien avec la base de données")
 
 
+@bp_services.route('/reserver/<int:id_service>', methods = ["GET","POST"])
+def reserver(id_service):
+    """Permet a un utilisateur de reserver un service"""
+    class_date = ""
+    class_heure = ""
+    if request.method == "POST":
+        if not session.get('identifiant'):
+            flash("Vous devez être connecté pour réserver un service.", "error")
+            abort(401)
+        date = request.form.get('date', "").strip()
+        heure = request.form.get('heure', "").strip()
+        with bd.creer_connexion() as conn:
+            service = bd.get_service(conn, id_service)
+            if  float(service['cout']) > float(session.get('credit', 0)):
+                    flash("Vous n'avez pas assez de crédit pour réserver ce service.", "error")
+                    redirect(url_for('accueil'), code=303)
+            elif bd.verifier_proprietaire_service(conn, id_service, session.get('identifiant')):
+                    flash("Vous ne pouvez pas réserver votre propre service.", "error")
+                    redirect(url_for('accueil'), code=303)
+            elif not date or not heure or not bd.est_Disponible(conn, id_service, date, heure):
+                    class_date = "is-invalid"
+                    class_heure = "is-invalid"
+            else:
+                bd.ajouter_reservation(conn, id_service, session.get('identifiant'), date, heure)
+                bd.update_credit_utilisateur(conn, service['id_utilisateur'] , session.get('identifiant'), service['cout'])
+                flash("Réservation effectuée avec succès.", "success")
+                return redirect(url_for('accueil'), code=303)
+    
+    return render_template("services/reservation.jinja" , class_date= class_date, class_heure= class_heure, id_service= id_service)
 
+@bp_services.route('/supprimer/<int:id_service>', methods=['POST', 'GET'])
+def supprimer(id_service):
+    """Permet a un utilisateur de supprimer un service"""
+    if not session.get('identifiant'):
+        flash("Vous devez être connecté pour supprimer un service.", "error")
+        abort(401)
+    with bd.creer_connexion() as conn:
+        if not bd.verifier_proprietaire_service(conn, id_service, session.get('identifiant')):
+            flash("Vous n'avez pas la permission de supprimer ce service.", "error")
+            abort(403)
+        elif bd.verifier_service_reserve(conn, id_service):
+            flash("Vous ne pouvez pas supprimer un service qui est réservé.", "error")
+            return redirect(url_for('accueil'), code=303)
+        else:
+            try:
+                bd.supprimer_service(conn, id_service)
+                flash("Service supprimé avec succès.", "success")
+            except Error:
+                abort(500, "Erreur en lien avec la base de données")
+            return redirect(url_for('accueil'), code=303)

@@ -4,6 +4,8 @@ Connexion à la BD
 import types
 import contextlib
 import mysql.connector
+import flask
+from flask import flash
 
 @contextlib.contextmanager
 def creer_connexion():
@@ -143,29 +145,74 @@ def get_supprimer_utilisateur(conn, id_utilisateur):
         )
         conn.commit()
 
-def supprimer_service(conn, id_service, id_proprietaire):
+def supprimer_service(conn, id_service):
     """Supprime un service appartenant à un utilisateur, s’il n’est pas réservé"""
     with conn.get_curseur() as curseur:
         curseur.execute("""
             DELETE FROM services
             WHERE id_service = %s
-              AND id_proprietaire = %s
-              AND id_service NOT IN (SELECT id_service FROM reservations)
-        """, (id_service, id_proprietaire))
+              AND id_service 
+        """, (id_service))
         conn.commit()
-        return curseur.rowcount > 0
 
-def verifier_disponibilite(conn, id_service, datetime_prestation, date_creation):
-    """Vérifie si un service est disponible à une date/heure donnée"""
+def verifier_service_reserve(conn, id_service):
+    """Vérifie si un service est réservé"""
     with conn.get_curseur() as curseur:
         curseur.execute("""
-            SELECT COUNT(*) AS total
+            SELECT * 
             FROM reservations
             WHERE id_service = %s
-              AND date_creation = %s
-              AND datetime_prestation = %s
-        """, (id_service, date_creation, datetime_prestation))
+        """, (id_service,))
+        resultat = curseur.fetchall()
+        return resultat is not None
+
+def verifier_proprietaire_service(conn, id_service, id_utilisateur):
+    """Vérifie si un utilisateur est le propriétaire d'un service"""
+    with conn.get_curseur() as curseur:
+        curseur.execute("""
+            SELECT * 
+            FROM services
+            WHERE id_service = %s
+              AND id_utilisateur = %s
+        """, (id_service, id_utilisateur))
         resultat = curseur.fetchone()
-        return resultat["total"] == 0
+        return resultat is not None
 
+def est_Disponible(conn, id_service, date_reservation, heure_reservation):
+    """Vérifie si un service est disponible à une date et heure données"""
+    with conn.get_curseur() as curseur:
+        curseur.execute("""
+            SELECT * 
+            FROM reservations
+            WHERE id_service = %s
+              AND date = %s
+              AND heure = %s
+        """, (id_service, date_reservation, heure_reservation))
+        resultat = curseur.fetchone()
+        return resultat is None
+            
+        
+def ajouter_reservation(conn, id_service, id_utilisateur, date, heure):
+    """Ajoute une réservation dans la base de données"""
+    with conn.get_curseur() as curseur:
+        curseur.execute("""
+            INSERT INTO reservations (id_service, id_utilisateur, date, heure)
+            VALUES (%s, %s, %s, %s)
+        """, (id_service, id_utilisateur, date, heure))
+        conn.commit()
 
+def update_credit_utilisateur(conn, id_prestateur, id_client, montant):
+    """Met à jour le crédit des utilisateurs après une réservation"""
+    with conn.get_curseur() as curseur:
+        curseur.execute("""
+            UPDATE utilisateur
+            SET credit = credit - %s
+            WHERE id_utilisateur = %s
+        """, (montant, id_client))
+        
+        curseur.execute("""
+            UPDATE utilisateur
+            SET credit = credit + %s
+            WHERE id_utilisateur = %s
+        """, (montant, id_prestateur))
+        conn.commit()

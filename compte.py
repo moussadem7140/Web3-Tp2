@@ -71,6 +71,7 @@ def se_connecter():
                 session['identifiant'] = user["id_utilisateur"]
                 session['courriel'] = user["courriel"]
                 session['role'] = user["role"]
+                session['credit'] = user["credit"]
                 session['langue'] =  "fr_CA"
                 flash("Connexion réussie.", "success")
                 return redirect(url_for('accueil'), code=303)
