@@ -17,16 +17,14 @@ def ajouter_utilisateur():
 
     if request.method == "POST":
         courriel = request.form.get('courriel', '').strip()
-        credit = request.form.get('credit', '').strip()
         mdp = request.form.get('mdp').strip()
         mdp_repeat = request.form.get('mdp_repeat').strip()
 
-        erreurs = utils.valider_formulaire(courriel, credit, mdp, mdp_repeat, REGEXE_EMAIL, REGEX_MDP, REGEX_HTML)
+        erreurs = utils.valider_formulaire(courriel, mdp, mdp_repeat, REGEXE_EMAIL, REGEX_MDP, REGEX_HTML)
         if "is-invalid" in erreurs.values():
             return render_template(
                 'compte/ajouter_utilisateur.jinja',
                 courriel=courriel,
-                credit=credit,
                 mdp = mdp,
                 mdp_repeat = mdp_repeat,
                 titre="Création de compte",
@@ -41,8 +39,7 @@ def ajouter_utilisateur():
             if user_doublon is None:
                 user = {
                     "courriel": courriel,
-                    "mdp": utils.hacher_mdp(mdp),
-                    "credit": credit,
+                    "mdp": utils.hacher_mdp(mdp)
                 }
                 bd.creer_user(conn, user)
                 flash("Utilisateur créé avec succès.", "success")
@@ -56,6 +53,7 @@ def ajouter_utilisateur():
         return redirect(url_for('accueil'), code=303)
 
     return render_template("compte/ajouter_utilisateur.jinja")
+
 @bp_compte.route('/se_connecter', methods = ["GET","POST"])
 def se_connecter():
     """Permet a l'utilisateur de se connecter et le rediriger vers la page d'accueil"""
@@ -83,12 +81,14 @@ def se_connecter():
                                     courriel = courriel,
                                     titre="Connexion")
     return render_template('compte/se_connecter.jinja')
+
 @bp_compte.route('/se_deconnecter')
 def se_deconnecter():
     """Permet a l'utilisateur de se deconnecter et le rediriger vers la page d'accueil"""
     session.clear()
     flash("Déconnexion réussie.", "success")
     return redirect(url_for('accueil'), code=303)
+
 @bp_compte.route('/liste_utilisateurs')
 def liste_utilisateurs():
     """Permet d'afficher la liste des utilisateurs"""
@@ -96,6 +96,7 @@ def liste_utilisateurs():
         utilisateurs = bd.get_liste_compte(conn)
         flash("Liste des utilisateurs chargée avec succès.", "success")
     return render_template('compte/liste_utilisateurs.jinja', utilisateurs=utilisateurs)
+
 @bp_compte.route('/supprimer_utilisateur/<int:id_utilisateur>', methods=['POST'])
 def supprimer_utilisateur(id_utilisateur):
     """Permet a un admin de supprimer un utilisateur"""
