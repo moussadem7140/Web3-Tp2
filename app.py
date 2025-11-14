@@ -55,7 +55,17 @@ def create_app():
         msg = getattr(e, 'description', "Page inexistante")
 
         return render_template("page_erreur.jinja", message = msg, code = 404), 404
-
+    @app.errorhandler(403)
+    def forbidden(e):
+        """Gère les erreurs 403"""
+        logger.exception(e)
+        return render_template('page_erreur.jinja', message="Vous n'avez pas la permission de faire cette action.", code = 403), 403
+                
+    @app.errorhandler(401)
+    def unauthorized(e):
+        """Gère les erreurs 401"""
+        logger.exception(e)
+        return render_template('page_erreur.jinja', message="Vous devez être connecté pour faire cette action.", code = 401), 401
 
     @app.errorhandler(500)
     def internal_server_error(e):
