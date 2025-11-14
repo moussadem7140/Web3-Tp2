@@ -8,7 +8,7 @@ bp_compte = Blueprint('compte', __name__)
 
 #regex pour verifier s'il y a une balise html dans les champs
 REGEXE_EMAIL = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-REGEX_MDP = re.compile(r"^(?=.[a-z])(?=.[A-Z])(?=.*\d).{8,}$")
+REGEX_MDP = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$")
 REGEX_HTML = re.compile( r'^[^<>]*$')
 
 @bp_compte.route('/ajouter_utilisateur', methods = ["GET","POST"])
@@ -17,8 +17,8 @@ def ajouter_utilisateur():
 
     if request.method == "POST":
         courriel = request.form.get('courriel', '').strip()
-        mdp = request.form.get('mdp').strip()
-        mdp_repeat = request.form.get('mdp_repeat').strip()
+        mdp = request.form.get('mdp', '').strip()
+        mdp_repeat = request.form.get('mdp_repeat', '').strip()
 
         erreurs = utils.valider_formulaire(courriel, mdp, mdp_repeat, REGEXE_EMAIL, REGEX_MDP, REGEX_HTML)
         if "is-invalid" in erreurs.values():
