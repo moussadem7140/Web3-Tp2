@@ -72,7 +72,7 @@ def get_categories(conn):
             curseur.execute("""
             SELECT id_categorie, nom_categorie FROM categories """)
             return curseur.fetchall()
-      
+
 def update_service(conn, id_service, titre, localisation, description, cout, actif, photo):
         with conn.get_curseur() as curseur:
                 curseur.execute('''UPDATE services
@@ -82,13 +82,12 @@ def update_service(conn, id_service, titre, localisation, description, cout, act
 def creer_user(conn,user):
     """ Permet d'ajouter un utilisateur dans la bd"""
     with conn.get_curseur() as curseur:
-        curseur.execute("""INSERT INTO `utilisateur` (`courriel`, `mdp`, `role`, `credit`)
-                           VALUES (%(courriel)s, %(mdp)s, %(role)s, %(credit)s)""", 
+        curseur.execute("""INSERT INTO `utilisateur` (`courriel`, `mdp`, `role`)
+                           VALUES (%(courriel)s, %(mdp)s, %(role)s)""",
                            {
                                "courriel": user["courriel"],
                                "mdp": user["mdp"],
                                "role": "user",
-                               "credit": user["credit"]
                            })
 
 
@@ -103,7 +102,7 @@ def authentification(conn,courriel,mdp):
                         })
         user = curseur.fetchone()
     return user
-        
+
 
 def verifie_doublon_courriel(conn, courriel):
     "Retourne true si le courriel est utilisé false si non"
