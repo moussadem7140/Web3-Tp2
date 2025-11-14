@@ -62,9 +62,9 @@
                     </ul>
 
                     <div class="d-flex align-items-center ms-lg-3 mt-2 mt-lg-0">
-                        <span class="me-2 text-white">🌍Langue:</span>
-                        <a href="{{url_for('services.changer_locale', locale=fr_CA)}}" class="btn btn-sm btn-outline-light me-1">FR</a>
-                        <a href="{{url_for('services.changer_locale', locale=en_CA)}}" class="btn btn-sm btn-outline-light ms-1">EN</a>
+                        <span class="me-2 text-white">🌍Langue: {{session.langue}}</span>
+                        <a href="{{url_for('services.changer_locale', locale='fr_CA')}}" class="btn btn-sm btn-outline-light me-1 " >FR</a>
+                        <a href="{{url_for('services.changer_locale', locale='en_CA')}}" class="btn btn-sm btn-outline-light ms-1">EN</a>
                     </div>
                 </div>
             </div>

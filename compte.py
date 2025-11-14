@@ -16,41 +16,47 @@ def ajouter_utilisateur():
     """Route vers la page de création du compte si GET si non Creation du compte si POST"""
 
     if request.method == "POST":
-        courriel = request.form.get('courriel', '').strip()
-        mdp = request.form.get('mdp', '').strip()
-        mdp_repeat = request.form.get('mdp_repeat', '').strip()
+        if 'identifiant' not in session:
+            abort(401)
+        elif session.get('role') != 'admin':
+            flash("Vous n'avez pas la permission de faire cette action.", "error")
+            abort(403)
+        else:
+            courriel = request.form.get('courriel', '').strip()
+            mdp = request.form.get('mdp', '').strip()
+            mdp_repeat = request.form.get('mdp_repeat', '').strip()
 
-        erreurs = utils.valider_formulaire(courriel, mdp, mdp_repeat, REGEXE_EMAIL, REGEX_MDP, REGEX_HTML)
-        if "is-invalid" in erreurs.values():
-            return render_template(
-                'compte/ajouter_utilisateur.jinja',
-                courriel=courriel,
-                mdp = mdp,
-                mdp_repeat = mdp_repeat,
-                titre="Création de compte",
-                class_nom=erreurs.get("class_nom", ""),
-                class_courriel=erreurs.get("class_courriel", ""),
-                class_mdp=erreurs.get("class_mdp", ""),
-                class_mdp_repeat=erreurs.get("class_mdp_repeat", "")
-            )
-
-        with bd.creer_connexion() as conn:
-            user_doublon = bd.verifie_doublon_courriel(conn,courriel)
-            if user_doublon is None:
-                user = {
-                    "courriel": courriel,
-                    "mdp": utils.hacher_mdp(mdp)
-                }
-                bd.creer_user(conn, user)
-                flash("Utilisateur créé avec succès.", "success")
-            else:
-                flash(
-                    "Cet utilisateur est déjà enregistré. "
-                    "Essayez de vous connecter ou utilisez un autre courriel.", "error"
+            erreurs = utils.valider_formulaire(courriel, mdp, mdp_repeat, REGEXE_EMAIL, REGEX_MDP, REGEX_HTML)
+            if "is-invalid" in erreurs.values():
+                return render_template(
+                    'compte/ajouter_utilisateur.jinja',
+                    courriel=courriel,
+                    mdp = mdp,
+                    mdp_repeat = mdp_repeat,
+                    titre="Création de compte",
+                    class_nom=erreurs.get("class_nom", ""),
+                    class_courriel=erreurs.get("class_courriel", ""),
+                    class_mdp=erreurs.get("class_mdp", ""),
+                    class_mdp_repeat=erreurs.get("class_mdp_repeat", "")
                 )
-                return redirect(url_for("compte.ajouter_utilisateur"), code=303)
 
-        return redirect(url_for('accueil'), code=303)
+            with bd.creer_connexion() as conn:
+                user_doublon = bd.verifie_doublon_courriel(conn,courriel)
+                if user_doublon is None:
+                    user = {
+                        "courriel": courriel,
+                        "mdp": utils.hacher_mdp(mdp)
+                    }
+                    bd.creer_user(conn, user)
+                    flash("Utilisateur créé avec succès.", "success")
+                else:
+                    flash(
+                        "Cet utilisateur est déjà enregistré. "
+                        "Essayez de vous connecter ou utilisez un autre courriel.", "error"
+                    )
+                    return redirect(url_for("compte.ajouter_utilisateur"), code=303)
+
+            return redirect(url_for('accueil'), code=303)
 
     return render_template("compte/ajouter_utilisateur.jinja")
 
@@ -85,21 +91,31 @@ def se_connecter():
 @bp_compte.route('/se_deconnecter')
 def se_deconnecter():
     """Permet a l'utilisateur de se deconnecter et le rediriger vers la page d'accueil"""
-    session.clear()
-    flash("Déconnexion réussie.", "success")
-    return redirect(url_for('accueil'), code=303)
+    if 'identifiant' not in session:
+        abort(401)
+    else:
+        session.clear()
+        flash("Déconnexion réussie.", "success")
+        return redirect(url_for('accueil'), code=303)
 
 @bp_compte.route('/liste_utilisateurs')
 def liste_utilisateurs():
-    """Permet d'afficher la liste des utilisateurs"""
-    with bd.creer_connexion() as conn:
-        utilisateurs = bd.get_liste_compte(conn)
-        flash("Liste des utilisateurs chargée avec succès.", "success")
-    return render_template('compte/liste_utilisateurs.jinja', utilisateurs=utilisateurs)
+    if 'identifiant' not in session:
+        abort(401)
+    elif session.get('role') != 'admin':
+        flash("Vous n'avez pas la permission de faire cette action.", "error")
+        abort(403)
+    else:
+        """Permet d'afficher la liste des utilisateurs"""
+        with bd.creer_connexion() as conn:
+            utilisateurs = bd.get_liste_compte(conn)
+            flash("Liste des utilisateurs chargée avec succès.", "success")
+        return render_template('compte/liste_utilisateurs.jinja', utilisateurs=utilisateurs)
 
 @bp_compte.route('/supprimer_utilisateur/<int:id_utilisateur>', methods=['POST'])
 def supprimer_utilisateur(id_utilisateur):
-    """Permet a un admin de supprimer un utilisateur"""
+    if 'identifiant' not in session:
+        abort(401)
     if session.get('role') != 'admin':
         flash("Vous n'avez pas la permission de faire cette action.", "error")
         abort(403)
