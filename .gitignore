@@ -21,4 +21,6 @@ rad.json
 #Test results file
 TestResults.xml
 _pycache_/
+.env
+static/css/styles.css.map
 *.pyc
