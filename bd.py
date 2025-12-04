@@ -216,3 +216,56 @@ def update_credit_utilisateur(conn, id_prestateur, id_client, montant):
             WHERE id_utilisateur = %s
         """, (montant, id_prestateur))
         conn.commit()
+
+def get_recherche_services(conn, query,all_services):
+    """Recherche des services en fonction des mots-clés"""
+    requete = """SELECT titre, description, id_annonce
+                FROM services WHERE (titre LIKE %(titre)s
+                OR description LIKE %(description)s)"""
+    params = {
+        'titre': f"%{query}%",
+        'description': f"%{query}%",
+    }
+
+    if not all_services:
+        requete += " AND est_active = 1"
+
+    requete += " LIMIT %(limit)s OFFSET %(offset)s"
+
+    with conn.get_curseur() as curseur:
+        curseur.execute(requete, params)
+        services = curseur.fetchall()
+
+    return services
+
+def count_recherche_services(conn, query, all_services):
+    """Recherche des services en fonction des mots-clés"""
+    requete = """
+    SELECT COUNT(*) AS total
+    FROM services
+    WHERE (titre LIKE %(titre)s OR description LIKE %(description)s)
+    """
+    if not all_services:
+        requete += " AND est_active = 1"
+
+    params = {
+        'titre': f"%{query}%",
+        'description': f"%{query}%"
+    }
+
+    with conn.get_curseur() as curseur:
+        curseur.execute(requete, params)
+        return curseur.fetchone()["total"]
+
+def get_api_recherche(conn, query):
+    """Suggestion de recherche d'annonce"""
+
+    with conn.get_curseur() as curseur:
+        curseur.execute("""SELECT id_service,titre
+                        FROM services
+                        WHERE (titre LIKE %(titre)s OR description LIKE %(description)s) LIMIT 5;
+                    """,{"titre":f"%{query}%","description":f"%{query}%"})
+
+        services = curseur.fetchall()
+
+    return services
