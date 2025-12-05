@@ -1,5 +1,10 @@
 {% extends "_layout.jinja" %}
-
+{% block scripts %}
+    <script defer
+        src="/static/js/utils-ajax.js"> </script>
+    <script defer
+        src="/static/js/gestion-compte.js"> </script>
+{% endblock %}
 {% block contenu %}
 <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="card p-4 bg-secondary" style="max-width: 600px; width: 100%;">
@@ -19,12 +24,12 @@
             {% endif %}
             {% endwith %}
 
-            <form method="post" action="{{ url_for('compte.ajouter_utilisateur') }}" novalidate>
+            <form method="post" action="{{ url_for('compte.ajouter_utilisateur') }}" id="formCreerCompte" novalidate>
                 <div class="mb-3">
                     <label class="form-label" for="courriel">Courriel</label>
                     <input type="email" class="form-control {{ class_courriel }}" name="courriel" id="courriel"
                         >
-                    <div class="invalid-feedback">Vous devez définir un courriel valide sur 50 caractères maximum !</div>
+                    <div class="invalid-feedback">Vous devez définir un courriel valide !</div>
                 </div>
 
                 <div class="mb-3">

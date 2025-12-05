@@ -17,3 +17,14 @@ def suggestion_rechercher():
         resultat = bd.get_api_recherche(conn, query)
 
     return jsonify(resultat)
+
+@bp_api.route('/verifier-courriel')
+def verifier_courriel():
+    """ Vérification du courriel """
+    courriel = request.args.get('courriel')
+
+    with bd.creer_connexion() as conn:
+        user_doublon = bd.verifie_doublon_courriel(conn, courriel)
+
+    return jsonify({"existe": user_doublon})
+

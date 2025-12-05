@@ -100,13 +100,13 @@ def se_deconnecter():
 
 @bp_compte.route('/liste_utilisateurs')
 def liste_utilisateurs():
+    """Permet d'afficher la liste des utilisateurs"""
     if 'identifiant' not in session:
         abort(401)
     elif session.get('role') != 'admin':
         flash("Vous n'avez pas la permission de faire cette action.", "error")
         abort(403)
     else:
-        """Permet d'afficher la liste des utilisateurs"""
         with bd.creer_connexion() as conn:
             utilisateurs = bd.get_liste_compte(conn)
             flash("Liste des utilisateurs chargée avec succès.", "success")
@@ -114,6 +114,7 @@ def liste_utilisateurs():
 
 @bp_compte.route('/supprimer_utilisateur/<int:id_utilisateur>', methods=['POST'])
 def supprimer_utilisateur(id_utilisateur):
+    """Permet de supprimer un utilisateur"""
     if 'identifiant' not in session:
         abort(401)
     if session.get('role') != 'admin':
