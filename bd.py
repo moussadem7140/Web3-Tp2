@@ -1,6 +1,7 @@
 """
 Connexion à la BD
 """
+import os
 import types
 import contextlib
 import mysql.connector
@@ -11,10 +12,10 @@ from flask import flash
 def creer_connexion():
     """Pour créer une connexion à la BD"""
     conn = mysql.connector.connect(
-        user='garneau',
-        password='qwerty_123',
-        host='127.0.0.1',
-        database='services_particuliers',
+        user=os.getenv('BD_UTILISATEUR'),
+        password=os.getenv('BD_MDP'),
+        host=os.getenv('BD_SERVEUR'),
+        database=os.getenv('BD_NOM_SCHEMA'),
         raise_on_warnings=True
     )
 
@@ -150,7 +151,7 @@ def supprimer_service(conn, id_service):
         curseur.execute("""
             DELETE FROM services
             WHERE id_service = %s
-              AND id_service 
+              AND id_service
         """, (id_service))
         conn.commit()
 
@@ -158,7 +159,7 @@ def verifier_service_reserve(conn, id_service):
     """Vérifie si un service est réservé"""
     with conn.get_curseur() as curseur:
         curseur.execute("""
-            SELECT * 
+            SELECT *
             FROM reservations
             WHERE id_service = %s
         """, (id_service,))
@@ -169,7 +170,7 @@ def verifier_proprietaire_service(conn, id_service, id_utilisateur):
     """Vérifie si un utilisateur est le propriétaire d'un service"""
     with conn.get_curseur() as curseur:
         curseur.execute("""
-            SELECT * 
+            SELECT *
             FROM services
             WHERE id_service = %s
               AND id_utilisateur = %s
@@ -181,7 +182,7 @@ def est_Disponible(conn, id_service, date_reservation, heure_reservation):
     """Vérifie si un service est disponible à une date et heure données"""
     with conn.get_curseur() as curseur:
         curseur.execute("""
-            SELECT * 
+            SELECT *
             FROM reservations
             WHERE id_service = %s
               AND date = %s
@@ -189,8 +190,8 @@ def est_Disponible(conn, id_service, date_reservation, heure_reservation):
         """, (id_service, date_reservation, heure_reservation))
         resultat = curseur.fetchone()
         return resultat is None
-            
-        
+
+
 def ajouter_reservation(conn, id_service, id_utilisateur, date, heure):
     """Ajoute une réservation dans la base de données"""
     with conn.get_curseur() as curseur:
@@ -208,10 +209,63 @@ def update_credit_utilisateur(conn, id_prestateur, id_client, montant):
             SET credit = credit - %s
             WHERE id_utilisateur = %s
         """, (montant, id_client))
-        
+
         curseur.execute("""
             UPDATE utilisateur
             SET credit = credit + %s
             WHERE id_utilisateur = %s
         """, (montant, id_prestateur))
         conn.commit()
+
+def get_recherche_services(conn, query,all_services):
+    """Recherche des services en fonction des mots-clés"""
+    requete = """SELECT titre, description, id_annonce
+                FROM services WHERE (titre LIKE %(titre)s
+                OR description LIKE %(description)s)"""
+    params = {
+        'titre': f"%{query}%",
+        'description': f"%{query}%",
+    }
+
+    if not all_services:
+        requete += " AND est_active = 1"
+
+    requete += " LIMIT %(limit)s OFFSET %(offset)s"
+
+    with conn.get_curseur() as curseur:
+        curseur.execute(requete, params)
+        services = curseur.fetchall()
+
+    return services
+
+def count_recherche_services(conn, query, all_services):
+    """Recherche des services en fonction des mots-clés"""
+    requete = """
+    SELECT COUNT(*) AS total
+    FROM services
+    WHERE (titre LIKE %(titre)s OR description LIKE %(description)s)
+    """
+    if not all_services:
+        requete += " AND est_active = 1"
+
+    params = {
+        'titre': f"%{query}%",
+        'description': f"%{query}%"
+    }
+
+    with conn.get_curseur() as curseur:
+        curseur.execute(requete, params)
+        return curseur.fetchone()["total"]
+
+def get_api_recherche(conn, query):
+    """Suggestion de recherche d'annonce"""
+
+    with conn.get_curseur() as curseur:
+        curseur.execute("""SELECT id_service,titre
+                        FROM services
+                        WHERE (titre LIKE %(titre)s OR description LIKE %(description)s) LIMIT 5;
+                    """,{"titre":f"%{query}%","description":f"%{query}%"})
+
+        services = curseur.fetchall()
+
+    return services

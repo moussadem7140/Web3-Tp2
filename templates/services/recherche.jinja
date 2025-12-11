@@ -1,0 +1,27 @@
+{% extends "_layout.jinja" %}
+
+{% block contenu %}
+<div class="container">
+    <div class="row">
+        {% if services|length == 0 %}
+            <p class="text-center">Aucune service disponible</p>
+        {% else %}
+            {% for service in services %}
+                <div class="col-sm-6 col-lg-4 mb-4">
+                    <div class="card">
+                        <img src="{{service.image_path}}" width="100" height="250" class="card-img-top" alt="Image annonce">
+                        <div class="card-body">
+                            <h5 class="card-title">{{service.titre}}</h5>
+                            <p class="card-text d-flex justify-content-between">
+                                <span class="fw-bold me-5">{{service.nom_categorie}} </span>
+                                <a href="{{url_for('services.details_service', id_service=service.id_service)}}" class="btn btn-primary m-2">Voir détails</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

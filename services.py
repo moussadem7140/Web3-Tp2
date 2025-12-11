@@ -1,11 +1,15 @@
-import re
-import os
+"""Gestion du bluprint des services"""
+from math import ceil
 from datetime import datetime
-from flask import Flask, render_template, abort, request, redirect, make_response, url_for, Blueprint, current_app as app, session, flash
-import mysql.connector
+from flask import Blueprint, render_template, abort, request, redirect, url_for, current_app as app, session, flash
 from mysql.connector import Error
 from babel import dates ,numbers
+
+import re
 import bd
+import os
+import utils
+
 bp_services = Blueprint('services', __name__)
 balises_html = re.compile(r'<(.*)>.*?|<(.*) />')
 langues_disponibles = ["en_CA", "fr_CA"]
@@ -50,12 +54,12 @@ def details_service(id_service):
                 service['cout']=numbers.format_currency(service['cout'],devise[locale],locale=locale)
             if 'identifiant' in session:
                 service["est_proprietaire"]= bd.verifier_proprietaire_service(conn, id_service, session.get('identifiant'))
-                       
+
         return render_template("services/service.jinja", service = service)
 
     except Error:
         abort(500, "Erreur en lien avec la base de données")
-    
+
 @bp_services.route("/ajouter_service", methods=['GET', 'POST'])
 def ajouter_service():
     if not session.get('identifiant'):
@@ -186,14 +190,14 @@ def modifier_service(id_service):
             cout = request.form.get("cout", "").strip()
             photo = request.files['image']
             if not photo :
-                class_photo = 'is-invalid'  
+                class_photo = 'is-invalid'
             nom_image = "image_" +titre+ ".png"
             chemin_complet = os.path.join(
                 app.config['CHEMIN_VERS_AJOUTS'], nom_image
             )
             photo.save(chemin_complet)
             photo = "/" + app.config['ROUTE_VERS_AJOUTS'] + "/" + nom_image
-    
+
             try:
                 actif = int(request.form.getlist('actif')[-1])
             except (ValueError, IndexError):
@@ -215,7 +219,7 @@ def modifier_service(id_service):
                     class_cout = 'is-invalid'
             except ValueError:
                 class_cout = 'is-invalid'
-            
+
             if not class_titre and not class_localisation and not class_description and not class_cout and not class_photo:
                 with bd.creer_connexion() as conn:
                     bd.update_service(conn, id_service, titre, localisation, description, cout, actif, photo)
@@ -255,7 +259,7 @@ def reserver(id_service):
                 bd.update_credit_utilisateur(conn, service['id_utilisateur'] , session.get('identifiant'), service['cout'])
                 flash("Réservation effectuée avec succès.", "success")
                 return redirect(url_for('accueil'), code=303)
-    
+
     return render_template("services/reservation.jinja" , class_date= class_date, class_heure= class_heure, id_service= id_service)
 
 @bp_services.route('/supprimer/<int:id_service>', methods=['POST', 'GET'])
@@ -278,3 +282,21 @@ def supprimer(id_service):
             except Error:
                 abort(500, "Erreur en lien avec la base de données")
             return redirect(url_for('accueil'), code=303)
+
+@bp_services.route('/recherche/query', methods=["GET"])
+def rechercher():
+    """Page de recherche des services"""
+
+    est_admin = session.get("est_admin")
+
+    query = request.args.get('query', '')
+
+    with bd.creer_connexion() as conn:
+        total_results = bd.count_recherche_services(conn, query, all_services=est_admin)
+
+        services = bd.get_recherche_services(conn, query, all_services=est_admin)
+
+        for service in services:
+            service["image_path"] = utils.get_image_path(service["id_service"])
+    return render_template('services/recherche.jinja', services=services,
+                           total_results=total_results, titre=f"Rechercher : {query}")

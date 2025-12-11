@@ -1,15 +1,25 @@
 """
 Une application Flask d'échange de service
 """
-import re
 import os
-import mysql.connector
+import dotenv
+
+from dotenv import load_dotenv
 from mysql.connector import Error
 from flask import Flask, render_template, session
 from flask.logging import create_logger
+
 from compte import bp_compte
 from services import bp_services
+from api import bp_api
 import bd
+
+if not os.getenv('BD_UTILISATEUR'):
+    dotenv.load_dotenv('.env')
+
+project_home = '/home/Valdess/420-05C-FX-TP3'
+load_dotenv(os.path.join(project_home, '.env'))
+
 def create_app():
     app = Flask(__name__)
     app.secret_key = "e468d2eb51a1fcea5386f35e887413d4fd3e091fdacb2ba3df28798e6fff98fa"
@@ -27,7 +37,8 @@ def create_app():
     logger = create_logger(app)
     app.register_blueprint(bp_compte, url_prefix = '/compte')
     app.register_blueprint(bp_services, url_prefix = '/services')
-
+    app.register_blueprint(bp_api, url_prefix='/api')
+    
     @app.route("/")
     def accueil():
         """Page d'accueil"""
@@ -40,7 +51,7 @@ def create_app():
                     else:
                         service['est_proprietaire'] = False
         return render_template("accueil.jinja", services = services)
-    
+
     @app.errorhandler(400)
     def bad_request(e):
         """Gère les erreurs 400"""
@@ -60,7 +71,7 @@ def create_app():
         """Gère les erreurs 403"""
         logger.exception(e)
         return render_template('page_erreur.jinja', message="Vous n'avez pas la permission de faire cette action.", code = 403), 403
-                
+
     @app.errorhandler(401)
     def unauthorized(e):
         """Gère les erreurs 401"""
