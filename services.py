@@ -265,7 +265,7 @@ def supprimer(id_service):
         flash("Vous devez être connecté pour supprimer un service.", "error")
         abort(401)
     with bd.creer_connexion() as conn:
-        if not bd.verifier_proprietaire_service(conn, id_service, session.get('identifiant')) or session.get('role')!="admin":
+        if not bd.verifier_proprietaire_service(conn, id_service, session.get('identifiant')) and session.get('role')!="admin":
             flash("Vous n'avez pas la permission de supprimer ce service.", "error")
             abort(403)
         elif bd.verifier_service_reserve(conn, id_service):
