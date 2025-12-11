@@ -108,8 +108,13 @@ def liste_utilisateurs():
         abort(403)
     else:
         with bd.creer_connexion() as conn:
-            utilisateurs = bd.get_liste_compte(conn)
-            flash("Liste des utilisateurs chargée avec succès.", "success")
+            if(request.args.get('id_unique')):
+                id_utilisateur=request.args.get('id_unique')
+                utilisateurs = bd.get_liste_compte(conn,id_utilisateur)
+                flash("Utilisateur trouvé avec succès.", "success")
+            else:
+                utilisateurs = bd.get_liste_compte(conn)
+                flash("Liste des utilisateurs chargée avec succès.", "success")
         return render_template('compte/liste_utilisateurs.jinja', utilisateurs=utilisateurs)
 
 @bp_compte.route('/supprimer_utilisateur/<int:id_utilisateur>', methods=['POST'])

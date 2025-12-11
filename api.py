@@ -28,3 +28,15 @@ def verifier_courriel():
 
     return jsonify({"existe": user_doublon})
 
+@bp_api.route('/utilisateurs-recherche')
+def utilisateurs_recherche():
+    """ recherche"""
+    user = request.args.get('user', '').strip().lower()
+
+    if not user or len(user) < 2:
+        return jsonify([])
+
+    with bd.creer_connexion() as conn:
+        resultat = bd.get_api_recherche2(conn, user)
+
+    return jsonify(resultat)

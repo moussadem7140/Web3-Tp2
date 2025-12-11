@@ -116,10 +116,15 @@ def verifie_doublon_courriel(conn, courriel):
 
         return user
 
-def get_liste_compte(conn):
+def get_liste_compte(conn, id=None):
     """Tous les services"""
     with conn.get_curseur() as curseur:
+        if not id:
             curseur.execute('''SELECT id_utilisateur, courriel, role, credit FROM utilisateur''')
+            user =curseur.fetchall()
+            return user
+        else:
+            curseur.execute('''SELECT id_utilisateur, courriel, role, credit FROM utilisateur WHERE id_utilisateur=%s''',(id,))
             user =curseur.fetchall()
             return user
 
@@ -269,3 +274,14 @@ def get_api_recherche(conn, query):
         services = curseur.fetchall()
 
     return services
+def get_api_recherche2(conn, query):
+    """Suggestion de recherche d'annonce"""
+
+    with conn.get_curseur() as curseur:
+        curseur.execute("""SELECT *
+                        FROM utilisateur
+                        WHERE (courriel LIKE %(courriel)s );
+                    """,{"courriel":f"%{query}%"})
+
+        utilisateurs = curseur.fetchall()
+    return utilisateurs
