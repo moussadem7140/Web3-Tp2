@@ -1,5 +1,5 @@
 """ Api"""
-from flask import Blueprint, jsonify, request,session,abort
+from flask import Blueprint, jsonify, request,session,abort, flash, redirect, url_for, current_app as app
 import utils
 import bd
 
@@ -40,3 +40,16 @@ def utilisateurs_recherche():
         resultat = bd.get_api_recherche2(conn, user)
 
     return jsonify(resultat)
+
+@bp_api.route('/verifier-disponibilite')    
+def verifier_disponibilite():
+    flash( "dans api" )
+    """Vérifie la disponibilité d'un service via l'API"""
+    id_service = request.args.get('id_service', type=int)
+    heure = request.args.get('heure', type=str)
+    date = request.args.get('date', type=str)
+    with bd.creer_connexion() as conn:
+        est_disponible = bd.est_Disponible(conn, id_service, date, heure)
+
+    # Retourner la clé 'disponible' pour correspondre au code JS
+    return jsonify({"disponible": est_disponible, "message": "ok"})
