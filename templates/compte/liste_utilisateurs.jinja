@@ -2,7 +2,7 @@
 
 {% block contenu %}
 <div class="container mt-5">
-  <h2 class="text-center mb-4">Gestion des utilisateurs</h2>
+  <h2 class="text-center mb-4"  data-nombre="{{utilisateurs|length}}" id="utilisateurs">Gestion des utilisateurs</h2>
   <table class="table table-striped table-bordered text-center align-middle">
     <thead class="table-dark">
       <tr>
@@ -12,17 +12,14 @@
       </tr>
     </thead>
     <tbody>
-      {% for u in utilisateurs %}
-      <tr>
-        <td>{{ u.courriel }}</td>
-        <td>{{ u.credit }}</td>
-        <td>{{ u.role }}</td>
+      {% for i in range(0, utilisateurs|length) %}
+      <tr id="afficher-{{utilisateurs[i].id_utilisateur}}">
+        <td>{{ utilisateurs[i].courriel }}</td>
+        <td>{{ utilisateurs[i].credit }}</td>
+        <td>{{ utilisateurs[i].role}}</td>
         <td>
           {% if session.role == 'admin' %}
-          <form method="post" action="{{ url_for('compte.supprimer_utilisateur', id_utilisateur=u.id_utilisateur) }}"
-            onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
-            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
-          </form>
+            <button type="submit" class="btn btn-danger btn-sm" data-utilisateur="{{utilisateurs[i].id_utilisateur}}" id="supprimer-{{i}}">Supprimer</button>
           {% else %}
           <span class="text-muted">Non autorisé</span>
           {% endif %}
@@ -56,4 +53,5 @@
 {% block script %}
         <script defer src="/static/js/liste_utilisateurs.js"></script>
         <script defer src="/static/js/utils-ajax.js"></script>
+        <script defer src="/static/js/suppression.js"></script>
 {% endblock %}

@@ -53,3 +53,17 @@ def verifier_disponibilite():
 
     # Retourner la clé 'disponible' pour correspondre au code JS
     return jsonify({"disponible": est_disponible, "message": "ok"})
+@bp_api.route('/supprimer_utilisateur', methods=['GET'])
+def supprimer_utilisateur():
+    """Permet de supprimer un utilisateur"""
+    id_utilisateur = request.args.get('id_utilisateur', type=int)
+    if 'identifiant' not in session:
+        abort(401)
+    if session.get('role') != 'admin':
+        flash("Vous n'avez pas la permission de faire cette action.", "error")
+        abort(403)
+    with bd.creer_connexion() as conn:
+        bd.get_supprimer_utilisateur(conn, id_utilisateur)
+        flash("Utilisateur supprimé avec succès.", "success")
+        return jsonify({"success": True})
+    return jsonify({"success": False})
