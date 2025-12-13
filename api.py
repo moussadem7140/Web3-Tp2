@@ -67,3 +67,15 @@ def supprimer_utilisateur():
         flash("Utilisateur supprimé avec succès.", "success")
         return jsonify({"success": True})
     return jsonify({"success": False})
+@bp_api.route("/accueil")
+def accueil():
+        """Page d'accueil"""
+        with bd.creer_connexion() as conn:
+            services = bd.get_services(conn)
+            if 'identifiant' in session:
+                for service in services:
+                    if bd.verifier_proprietaire_service(conn, service['id_service'], session.get('identifiant')):
+                        service['est_proprietaire'] = True
+                    else:
+                        service['est_proprietaire'] = False
+        return jsonify(services)

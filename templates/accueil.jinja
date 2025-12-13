@@ -8,7 +8,7 @@
 
 <div class="container mt-4">
     <h2 class="mb-4">Derniers services ajoutés</h2>
-    <div class="row">
+    <div class="row" id="services" data-role="{{session.role}}">
         {% if services %}
         {% for service in services %}
         <div class="col-md-4 mb-3">
@@ -55,7 +55,7 @@
         </div>
     {% endblock %}
     {% block script %}
-        <script defer src="/static/js/recherche.js"></script>
+        <script defer src="/static/js/acceuil.js"></script>
         <script defer src="/static/js/utils-ajax.js"></script>
 
     {% endblock %}
