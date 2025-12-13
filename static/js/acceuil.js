@@ -10,7 +10,7 @@
 "use strict";
 let controleur = null;
 const liste_services = document.getElementById("services");
-role = liste_services.dataset.role;
+let role = liste_services.dataset.role;
 async function afficher_services() {
 
 

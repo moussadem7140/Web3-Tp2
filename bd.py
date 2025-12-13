@@ -43,6 +43,7 @@ def get_curseur(self):
         curseur.close()
 
 def get_services(conn, tous = False):
+    """Selectionner tout les services"""
     with conn.get_curseur() as curseur:
         if tous:
             curseur.execute('''SELECT s.id_service, s.titre, s.localisation, s.date_creation,s.photo, c.nom_categorie
