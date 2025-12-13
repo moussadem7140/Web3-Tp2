@@ -68,6 +68,7 @@ def get_services_api(conn, offset=0, limit=6):
     return services
 
 def get_service(conn, id_service):
+       """Afficher les services"""
        with conn.get_curseur() as curseur:
                 curseur.execute('''SELECT s.id_service, s.photo, s.id_utilisateur, s.titre, s.localisation, s.description, s.cout, s.date_creation, s.actif, c.nom_categorie
                             FROM services s JOIN categories c ON s.id_categorie = c.id_categorie
@@ -78,17 +79,20 @@ def get_service(conn, id_service):
                 return curseur.fetchone()
 
 def add_service(conn, service):
+        """Ajouter services"""
         with conn.get_curseur() as curseur:
                 curseur.execute('''INSERT INTO services(titre, description,localisation, actif, cout, id_categorie, date_creation, photo, id_utilisateur)
                             VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)''', (service['titre'], service['description'], service['localisation'], service['actif'], service['cout'], service['id_categorie'], service['date_creation'], service['photo'], service['id_utilisateur']))
 
 def get_categories(conn):
+      """Afficher leses categories"""
       with conn.get_curseur() as curseur:
             curseur.execute("""
             SELECT id_categorie, nom_categorie FROM categories """)
             return curseur.fetchall()
 
 def update_service(conn, id_service, titre, localisation, description, cout, actif, photo):
+        """Modifier un service"""
         with conn.get_curseur() as curseur:
                 curseur.execute('''UPDATE services
                             SET titre = %s, localisation = %s, description = %s, cout =%s, actif = %s, photo = %s

@@ -3,7 +3,6 @@ from datetime import datetime
 from flask import Blueprint, render_template, abort, request, redirect, url_for, current_app as app, session, flash
 from mysql.connector import Error
 from babel import dates ,numbers
-from flask import jsonify
 
 import re
 import bd
@@ -63,10 +62,10 @@ def details_service(id_service):
 
 @bp_services.route("/ajouter_service", methods=['GET', 'POST'])
 def ajouter_service():
+    """Permet d'ajouter un service"""
     if not session.get('identifiant'):
         flash("Vous devez être connecté pour ajouter un service.", "error")
         abort(401)
-    """Permet d'ajouter un service"""
 
     class_titre = ''
     class_localisation = ''
@@ -156,6 +155,7 @@ def ajouter_service():
 
 @bp_services.route("/modifier_service/<int:id_service>", methods= ['GET', 'POST'])
 def modifier_service(id_service):
+    """Permet de modifier un service existant"""
     if not session.get('identifiant'):
         flash("Vous devez être connecté pour modifier un service.", "error")
         abort(401)
@@ -163,7 +163,7 @@ def modifier_service(id_service):
         if not bd.verifier_proprietaire_service(conn, id_service, session.get('identifiant')) and session.get('role')!="admin":
             flash("Vous n'avez pas la permission de modifier ce service.", "error")
             abort(403)
-    """Permet de modifier un service existant"""
+
     locale = get_local()
 
     if not id_service:
