@@ -40,27 +40,6 @@ def listes_services():
                     service['est_proprietaire'] = False
     return render_template("services/listes_services.jinja", services = services)
 
-
-@bp_services.route("/api/services")
-def api_services():
-    """Retourne une liste de services paginés pour le défilement infini."""
-    try:
-        offset = int(request.args.get("offset", 0))
-        limit = int(request.args.get("limit", 6))  # 6 au départ, puis 3 dans le JS
-
-        with bd.creer_connexion() as conn:
-            services = bd.get_services_pagination(conn, offset, limit)
-
-            # Ajout image_path
-            for service in services:
-                service["image_path"] = utils.get_image_path(service["id_service"])
-
-        return jsonify(services)
-
-    except Exception as e:
-        print("Erreur API services:", e)
-        abort(500)
-
 @bp_services.route("details_service/<int:id_service>")
 def details_service(id_service):
     """Affiche les détails d'un service"""

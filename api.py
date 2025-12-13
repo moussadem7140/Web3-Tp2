@@ -55,7 +55,7 @@ def utilisateurs_recherche():
 
     return jsonify(resultat)
 
-@bp_api.route('/verifier-disponibilite')    
+@bp_api.route('/verifier-disponibilite')
 def verifier_disponibilite():
     flash( "dans api" )
     """Vérifie la disponibilité d'un service via l'API"""
@@ -93,3 +93,22 @@ def accueil():
                     else:
                         service['est_proprietaire'] = False
         return jsonify(services)
+
+@bp_api.route('/supprimer_service', methods=['POST', 'GET'])
+def supprimer_service():
+    """Permet de supprimer un service via AJAX"""
+    id_service = request.args.get('id_service', type=int)
+    if 'identifiant' not in session:
+        return jsonify({"success": False, "message": "Non connecté"}), 401
+
+    with bd.creer_connexion() as conn:
+        if not bd.verifier_proprietaire_service(conn, id_service, session.get('identifiant')) \
+           and session.get('role') != "admin":
+            return jsonify({"success": False, "message": "Pas la permission"}), 403
+
+        if bd.verifier_service_reserve(conn, id_service):
+            return jsonify({"success": False, "message": "Service réservé"}), 409
+
+        bd.supprimer_service(conn, id_service)
+
+    return jsonify({"success": True})
