@@ -55,6 +55,18 @@ def get_services(conn, tous = False):
                     WHERE s.actif = 1 ORDER BY s.date_creation DESC LIMIT 5''')
             return curseur.fetchall()
 
+def get_services_api(conn, offset=0, limit=6):
+    """Retourne une liste limitée d'annonces actives, non vendues"""
+    with conn.get_curseur() as curseur:
+        curseur.execute("""
+            SELECT s.id_service, s.titre, s.localisation, s.date_creation,s.photo, c.nom_categorie
+            FROM services s JOIN categories c ON s.id_categorie = c.id_categorie
+            ORDER By s.date_creation  Desc
+            LIMIT %s OFFSET %s
+        """, (limit, offset))
+        services = curseur.fetchall()
+    return services
+
 def get_service(conn, id_service):
        with conn.get_curseur() as curseur:
                 curseur.execute('''SELECT s.id_service, s.photo, s.id_utilisateur, s.titre, s.localisation, s.description, s.cout, s.date_creation, s.actif, c.nom_categorie

@@ -3,14 +3,15 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>{{titre}}</title>
+    <title>{{ titre }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/static/favicon.ico" />
     <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="static/css/styles.sass" />
-    <script defer src="/static/js/utils-ajax.js"> </script>
-    <script defer src="/static/js/recherche.js"></script>
+
+    {% block scripts %}
+    {% endblock %}
 </head>
 
 <body>
@@ -22,66 +23,62 @@
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item pe-4">
                             <a class="nav-link active" aria-current="page" href="/">Accueil</a>
                         </li>
-                        {% if session['identifiant'] %}
+                        {% if session.get('identifiant') %}
                         <li class="nav-item pe-4">
-                            <a class="nav-link" href="{{url_for('services.ajouter_service')}}">Ajouter un service</a>
+                            <a class="nav-link" href="{{ url_for('services.ajouter_service') }}">Ajouter un service</a>
                         </li>
-                        {%endif%}
-                        {% if session.identifiant and session.role=="admin"%}
+                        {% endif %}
+                        {% if session.get('identifiant') and session.get('role') == "admin" %}
                         <li class="nav-item pe-4">
-                            <a class="nav-link" href="{{url_for('compte.ajouter_utilisateur')}}">Ajouter un
-                                utilisateur</a>
+                            <a class="nav-link" href="{{ url_for('compte.ajouter_utilisateur') }}">Ajouter un utilisateur</a>
                         </li>
-                        {%endif%}
-                        {% if session.identifiant and session.role=="admin"%}
                         <li class="nav-item pe-4">
-                            <a class="nav-link" href="{{url_for('compte.liste_utilisateurs')}}">Liste des
-                                utilisateurs</a>
+                            <a class="nav-link" href="{{ url_for('compte.liste_utilisateurs') }}">Liste des utilisateurs</a>
                         </li>
-                        {%endif%}
+                        {% endif %}
                         <li class="nav-item pe-4">
-                            <a class="nav-link" href="{{url_for('services.listes_services')}}">Listes des services</a>
+                            <a class="nav-link" href="{{ url_for('services.listes_services') }}">Listes des services</a>
                         </li>
-                        {% if not session.identifiant %}
+                        {% if not session.get('identifiant') %}
                         <li class="nav-item pe-4">
-                            <a class="nav-link" href="{{url_for('compte.se_connecter')}}">Se_connecter</a>
+                            <a class="nav-link" href="{{ url_for('compte.se_connecter') }}">Se_connecter</a>
                         </li>
-                        {%endif%}
-                        {% if session.identifiant%}
+                        {% endif %}
+                        {% if session.get('identifiant') %}
                         <li class="nav-item pe-4">
-                            <a class="nav-link" href="{{url_for('compte.se_deconnecter')}}">Se_deconnecter</a>
+                            <a class="nav-link" href="{{ url_for('compte.se_deconnecter') }}">Se_deconnecter</a>
                         </li>
-                        {%endif%}
+                        {% endif %}
                     </ul>
 
                     <div class="d-flex align-items-center ms-lg-3 mt-2 mt-lg-0">
                         <span class="me-2 text-white">Langue:</span>
-                        <a href="{{url_for('services.changer_locale', locale='fr_CA')}}"
-                            class="btn btn-sm btn-outline-light me-1 ">FR</a>
-                        <a href="{{url_for('services.changer_locale', locale='en_CA')}}"
-                            class="btn btn-sm btn-outline-light ms-1">EN</a>
+                        <a href="{{ url_for('services.changer_locale', locale='fr_CA') }}"
+                           class="btn btn-sm btn-outline-light me-1">FR</a>
+                        <a href="{{ url_for('services.changer_locale', locale='en_CA') }}"
+                           class="btn btn-sm btn-outline-light ms-1">EN</a>
                     </div>
                 </div>
             </div>
         </nav>
+
         <div class="container mt-3 position-relative" style="max-width: 600px;">
             <div class="d-flex position-relative">
                 <input id="search" type="search" class="form-control" placeholder="Recherche..." aria-label="Recherche"
-                    autocomplete="off" />
+                       autocomplete="off" />
                 <div id="chargement"
-                    class="spinner-border text-primary d-none position-absolute top-50 end-0 translate-middle-y me-3"
-                    role="status" style="width: 1rem; height: 1rem;">
+                     class="spinner-border text-primary d-none position-absolute top-50 end-0 translate-middle-y me-3"
+                     role="status" style="width: 1rem; height: 1rem;">
                     <span class="visually-hidden">Chargement...</span>
                 </div>
             </div>
@@ -90,8 +87,10 @@
             </ul>
         </div>
     </header>
-    <main>
+
+    <main class="container mt-4">
         <h2>{{ titre }}</h2>
+
         {% with messages = get_flashed_messages(with_categories=True) %}
         {% if messages %}
         <div class="flash-container">
@@ -105,20 +104,18 @@
         {% endif %}
         {% endwith %}
 
-        {% block contenu%}
-
-        {% endblock%}
+        {% block contenu %}
+        {% endblock %}
     </main>
 
     <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
         <div class="col-md-4 d-flex align-items-center container">
-            <span class="mb-3 mb-md-0 text-body-secondary">© 2025 - Créé par Valdess POMBOUH TASSÉ & Moussa
-                DEMBELE</span>
+            <span class="mb-3 mb-md-0 text-body-secondary">
+                © 2025 - Créé par Valdess POMBOUH TASSÉ & Moussa DEMBELE
+            </span>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
-
 </html>

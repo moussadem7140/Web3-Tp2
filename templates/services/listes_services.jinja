@@ -1,37 +1,21 @@
 {% extends "_layout.jinja" %}
 
-{% block title %}Listes de tout les services | PianoServices{% endblock %}
+{% block title %}Liste de tous les services | PianoServices{% endblock %}
 
 {% block contenu %}
 <div class="container mt-4">
-    <h2 class="mb-4">Tout les services</h2>
-    <div class="row">
-        {% if services %}
-        {% for service in services %}
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
-                <img src="{{service.photo}}"  class="card-img p-2" width="400" height="500" alt="Image par défaut">
-                <div class="card-body">
-                    <h5 class="card-title"> {{ service.titre }}</h5>
-                    <p class="card-text">
-                        <strong>Catégorie :</strong> {{ service.nom_categorie }} <br>
-                        <strong>Localisation :</strong> {{ service.localisation }}
-                    </p>
-                     <a href="{{url_for('services.details_service', id_service=service.id_service)}}" class="btn btn-primary m-2">Voir détails</a>
-                    {% if session.identifiant and not service.est_proprietaire %}
-                        <a href="{{url_for('services.reserver', id_service=service.id_service)}}" class="btn btn-primary m-2">Reserver</a>
-                    {% endif %}
-                    {% if session.identifiant and (service.est_proprietaireproprietaire or session.role=="admin") %}
-                        <a href="{{url_for('services.supprimer', id_service=service.id_service)}}" class="btn btn-primary m-2">Supprimer</a>
-                    {% endif %}
-                </div>
+    <h2 class="mb-4">Tous les services</h2>
+    <div class="row" id="row-services">
+        <noscript>
+            <div class="alert alert-danger text-center mt-3">
+                Veuillez activer votre Javascript
             </div>
-        </div>
-        {% endfor %}
-        {% else %}
-        <p>Aucun service actif pour le moment.</p>
-        {% endif %}
+        </noscript>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
+<script defer src="{{ url_for('static', filename='js/utils-ajax.js') }}"></script>
+<script defer src="{{ url_for('static', filename='js/services.js') }}"></script>
 {% endblock %}

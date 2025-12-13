@@ -17,10 +17,11 @@ import bd
 if not os.getenv('BD_UTILISATEUR'):
     dotenv.load_dotenv('.env')
 
-project_home = '/home/Valdess/420-05C-FX-TP3'
+project_home = '/home/Valdess/420-05C-FX-TP3/WebTp2'
 load_dotenv(os.path.join(project_home, '.env'))
 
 def create_app():
+    """create"""
     app = Flask(__name__)
     app.secret_key = "e468d2eb51a1fcea5386f35e887413d4fd3e091fdacb2ba3df28798e6fff98fa"
     # Liste des sous-répertoires vers "ajouts"
@@ -38,7 +39,7 @@ def create_app():
     app.register_blueprint(bp_compte, url_prefix = '/compte')
     app.register_blueprint(bp_services, url_prefix = '/services')
     app.register_blueprint(bp_api, url_prefix='/api')
-    
+
     @app.route("/")
     def accueil():
         """Page d'accueil"""
