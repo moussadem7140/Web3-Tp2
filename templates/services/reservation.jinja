@@ -16,14 +16,18 @@
                     <div class="col-md-12">
                         <label class="form-label" for="mdp">Heure</label>
                         <input type="time" class="form-control {{class_heure}}" name="heure" id="heure">
-                        <div class="invalid-feedback">le service n'est pas valide a cette date et heure</div>
+                        <div class="invalid-feedback" >le service n'est pas valide a cette date et heure</div>
                     </div>
                 </div>
                 <div class="text-center mt-3">
-                    <button type="submit" class="btn btn-primary w-25">Valider</button>
+                    <button type="submit" class="btn btn-primary w-25" id="reserver" data-service="{{id_service}}">Valider</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+{% endblock %}
+{% block script %}
+<script defer src="/static/js/reservation.js"></script>
+<script defer src="/static/js/utils-ajax.js"></script>
 {% endblock %}

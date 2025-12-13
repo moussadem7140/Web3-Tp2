@@ -108,20 +108,12 @@ def liste_utilisateurs():
         abort(403)
     else:
         with bd.creer_connexion() as conn:
-            utilisateurs = bd.get_liste_compte(conn)
-            flash("Liste des utilisateurs chargée avec succès.", "success")
+            if(request.args.get('id_unique')):
+                id_utilisateur=request.args.get('id_unique')
+                utilisateurs = bd.get_liste_compte(conn,id_utilisateur)
+                flash("Utilisateur trouvé avec succès.", "success")
+            else:
+                utilisateurs = bd.get_liste_compte(conn)
+                flash("Liste des utilisateurs chargée avec succès.", "success")
         return render_template('compte/liste_utilisateurs.jinja', utilisateurs=utilisateurs)
 
-@bp_compte.route('/supprimer_utilisateur/<int:id_utilisateur>', methods=['POST'])
-def supprimer_utilisateur(id_utilisateur):
-    """Permet de supprimer un utilisateur"""
-    if 'identifiant' not in session:
-        abort(401)
-    if session.get('role') != 'admin':
-        flash("Vous n'avez pas la permission de faire cette action.", "error")
-        abort(403)
-    with bd.creer_connexion() as conn:
-        bd.get_supprimer_utilisateur(conn, id_utilisateur)
-        flash("Utilisateur supprimé avec succès.", "success")
-
-    return redirect(url_for('compte.liste_utilisateurs'), code=303)

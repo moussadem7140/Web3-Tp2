@@ -8,7 +8,7 @@
 
 <div class="container mt-4">
     <h2 class="mb-4">Derniers services ajoutés</h2>
-    <div class="row">
+    <div class="row" id="services" data-role="{{session.role}}">
         {% if services %}
         {% for service in services %}
         <div class="col-md-4 mb-3">
@@ -38,3 +38,24 @@
 </div>
 
 {% endblock %}
+{%block recherche%}
+           <div class="container mt-3 position-relative" style="max-width: 600px;">
+            <div class="d-flex position-relative">
+                <input id="search" type="search" class="form-control" placeholder="Recherche..." aria-label="Recherche"
+                    autocomplete="off" />
+                <div id="chargement"
+                    class="spinner-border text-primary d-none position-absolute top-50 end-0 translate-middle-y me-3"
+                    role="status" style="width: 1rem; height: 1rem;">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+            </div>
+            <ul id="resultats-recherche"
+                class="list-group position-absolute top-100 start-0 w-100 z-3 d-none mt-1 shadow">
+            </ul>
+        </div>
+    {% endblock %}
+    {% block script %}
+        <script defer src="/static/js/acceuil.js"></script>
+        <script defer src="/static/js/utils-ajax.js"></script>
+
+    {% endblock %}

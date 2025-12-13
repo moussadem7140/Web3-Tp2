@@ -8,9 +8,7 @@
 /*global envoyerRequeteAjax*/
 
 "use strict";
-
 let controleur = null;
-
 const recherche = document.getElementById("search");
 const chargement = document.getElementById("chargement");
 const listeResultats = document.getElementById("resultats-recherche");
@@ -19,20 +17,16 @@ function sauvegarderHistorique(terme) {
     let historique = JSON.parse(localStorage.getItem("historiqueRecherche")) || [];
 
     // éviter doublons
-    if (!historique.includes(terme)) {
+     if (!historique.includes(terme)) {
         historique.unshift(terme);
     }
-
-    // max 10 items
-    historique = historique.slice(0, 10);
-
     localStorage.setItem("historiqueRecherche", JSON.stringify(historique));
 }
 
 async function rechercher() {
     const aChercher = recherche.value.trim();
 
-    if (aChercher.length < 3) {
+    if (aChercher.length < 4) {
         listeResultats.classList.add("d-none");
         listeResultats.innerHTML = "";
         return;
@@ -40,20 +34,19 @@ async function rechercher() {
 
     chargement.classList.remove("d-none");
 
-    if (controleur) controleur.abort();
-        controleur = new AbortController();
 
     try {
         const resultats = await envoyerRequeteAjax(
-            "/api/suggestion-recherche",
+            "/api/utilisateurs-recherche",
             "GET",
-            { query: aChercher },
+            { user: aChercher },
             controleur
         );
-        console.log("moussa");
+
         afficherResultats(resultats);
         chargement.classList.add("d-none");
         controleur = null;
+        console.log("Aucun  trouvé");
     } catch (err) {
         if (err.name !== "AbortError") {
             console.error("Erreur AJAX :", err);
@@ -69,18 +62,19 @@ function afficherResultats(resultats) {
 
     if (!resultats || resultats.length === 0) {
         listeResultats.classList.add("d-none");
+        console.log("Aucun résultat trouvé");
         return;
     }
 
     for (const service of resultats) {
         const li = document.createElement("li");
         li.className = "list-group-item list-group-item-action";
-        li.textContent = service.titre;
+        li.textContent = service.courriel;
         li.style.cursor = "pointer";
 
         li.addEventListener("click", () => {
-            sauvegarderHistorique(service.titre);
-            window.location.href = `/services/details_service/${service.id_service}`;
+            sauvegarderHistorique(service.courriel);
+            window.location.href = `/compte/liste_utilisateurs?id_unique=${service.id_utilisateur}`;
         });
 
         listeResultats.appendChild(li);
