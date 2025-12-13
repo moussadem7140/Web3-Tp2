@@ -22,7 +22,6 @@ function sauvegarderHistorique(terme) {
     if (!historique.includes(terme)) {
         historique.unshift(terme);
     }
-
     // max 10 items
     historique = historique.slice(0, 10);
 
@@ -50,7 +49,6 @@ async function rechercher() {
             { query: aChercher },
             controleur
         );
-        console.log("moussa");
         afficherResultats(resultats);
         chargement.classList.add("d-none");
         controleur = null;
