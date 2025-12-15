@@ -18,11 +18,10 @@ const listeResultats = document.getElementById("resultats-recherche");
 function sauvegarderHistorique(terme) {
     let historique = JSON.parse(localStorage.getItem("historiqueRecherche")) || [];
 
-    // éviter doublons
     if (!historique.includes(terme)) {
         historique.unshift(terme);
     }
-    // max 10 items
+
     historique = historique.slice(0, 10);
 
     localStorage.setItem("historiqueRecherche", JSON.stringify(historique));
@@ -97,13 +96,6 @@ function lancerRechercheFinale() {
 
 function initialisation() {
     recherche.addEventListener("input", rechercher);
-
-    // Appui sur Entrée → lancer recherche
-    recherche.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            lancerRechercheFinale();
-        }
-    });
 
     // Cacher suggestions si clic ailleurs
     document.addEventListener("click", (e) => {

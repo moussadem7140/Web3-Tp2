@@ -1,4 +1,4 @@
-/*global envoyerRequeteAjax*/
+/*global*/
 
 "use strict";
 
@@ -49,7 +49,6 @@ function creerCarteService(service) {
         cardBody.appendChild(btnReserver);
     }
 
-    // Supprimer si admin ou propriétaire
     if (sessionStorage.getItem('role') === "admin" || service.est_proprietaire) {
         const btnSupprimer = document.createElement("a");
         btnSupprimer.href = `/services/supprimer/${service.id_service}`;
@@ -67,7 +66,6 @@ function creerCarteService(service) {
 async function chargerServices() {
     const response = await fetch(`/api/services?offset=${offset}&limit=${limit}`);
     const services = await response.json();
-    //const services = await envoyerRequeteAjax("api/services")
 
     const row = document.getElementById("row-services");
 
@@ -79,8 +77,8 @@ async function chargerServices() {
         }
         return;
     }
-
-    for (const service of services) {
+    for (let i = 0; i < services.length; i++) {
+        const service = services[i];
         const carte = creerCarteService(service);
         row.appendChild(carte);
     }
@@ -99,15 +97,18 @@ function gererScroll() {
 }
 
 async function initialisation() {
-    //try{
-       //await chargerServices();
-       //window.addEventListener("scroll", gererScroll);
-    //}catch(error){
-        //console.log(error);
-    //}
-    chargerServices().then(() => {
-        window.addEventListener("scroll", gererScroll);
-    });
+    try{
+       await chargerServices();
+       while (document.body.offsetHeight < window.innerHeight) {
+            const servicesAvant = offset;
+            await chargerServices();
+            if (offset === servicesAvant) break;
+        }
+       window.addEventListener("scroll", gererScroll);
+    }catch(error){
+        console.log(error);
+    }
+
 }
 
 window.addEventListener("load", initialisation);

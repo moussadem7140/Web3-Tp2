@@ -62,33 +62,11 @@ def get_services_api(conn, offset=0, limit=6):
         curseur.execute("""
             SELECT s.id_service, s.titre, s.localisation, s.date_creation,s.photo, c.nom_categorie
             FROM services s JOIN categories c ON s.id_categorie = c.id_categorie
-            ORDER By s.date_creation  Desc
+            ORDER BY s.date_creation  DESC
             LIMIT %s OFFSET %s
         """, (limit, offset))
         services = curseur.fetchall()
     return services
-
-def get_services_pagination(conn, offset, limit):
-    """Retourne tous les services avec pagination."""
-    cursor = conn.cursor(dictionary=True)
-    query = """
-        SELECT
-            s.id_service,
-            s.titre,
-            s.description,
-            s.localisation,
-            s.photo,
-            s.actif,
-            s.id_utilisateur,
-            c.nom_categorie
-        FROM services s
-        JOIN categories c ON s.id_categorie = c.id_categorie
-        ORDER BY s.date_creation DESC
-        LIMIT %s OFFSET %s
-    """
-    cursor.execute(query, (limit, offset))
-    return cursor.fetchall()
-
 
 def get_service(conn, id_service):
        """Afficher les services"""
@@ -261,26 +239,22 @@ def update_credit_utilisateur(conn, id_prestateur, id_client, montant):
         """, (montant, id_prestateur))
         conn.commit()
 
-def get_recherche_services(conn, query,all_services):
-    """Recherche des services en fonction des mots-clés"""
-    requete = """SELECT titre, description, id_annonce
-                FROM services WHERE (titre LIKE %(titre)s
-                OR description LIKE %(description)s)"""
-    params = {
-        'titre': f"%{query}%",
-        'description': f"%{query}%",
-    }
+def get_recherche_services(conn, query, all_services):
+    """recherche service"""
+    requete = """
+        SELECT id_service, titre, description, nom_categorie
+        FROM services
+        WHERE (titre LIKE %(q)s OR description LIKE %(q)s)
+    """
 
     if not all_services:
         requete += " AND est_active = 1"
 
-    requete += " LIMIT %(limit)s OFFSET %(offset)s"
+    params = {"q": f"%{query}%"}
 
     with conn.get_curseur() as curseur:
         curseur.execute(requete, params)
-        services = curseur.fetchall()
-
-    return services
+        return curseur.fetchall()
 
 def count_recherche_services(conn, query, all_services):
     """Recherche des services en fonction des mots-clés"""

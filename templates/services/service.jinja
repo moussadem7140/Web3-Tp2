@@ -8,10 +8,10 @@
 <div class="card container mt-4">
     <h3 class="card-header "> {{ service.titre }}</h3>
 
-    <img src="{{service.photo}}" class="card-img p-2" width="400"
-        height="500" alt="Image annonce" />
+    <img src="{{ url_for('static', filename='images/ajouts/' ~ service.photo) }}" class="card-img-top" width="100"
+        height="250" alt="Image du service">
     <div class="card-body">
-     <hr>
+        <hr>
         <div class="row mb-2">
             <p><strong>Localisation :</strong> {{service.localisation}}</p>
             <p><strong>Description :</strong> {{ service.description }}</p>
@@ -35,9 +35,10 @@
                 </p>
             </div>
             {%if ('identifiant' in session and service.est_proprietaire) or session.role=="admin"%}
-                <div class="col-md-4">
-                    <a href="{{url_for('services.modifier_service', id_service=service.id_service)}}" class="btn btn-primary">Modifier</a>
-                </div>
+            <div class="col-md-4">
+                <a href="{{url_for('services.modifier_service', id_service=service.id_service)}}"
+                    class="btn btn-primary">Modifier</a>
+            </div>
             {% endif %}
         </div>
     </div>

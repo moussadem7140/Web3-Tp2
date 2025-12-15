@@ -7,26 +7,28 @@ bp_api = Blueprint('api', __name__)
 
 @bp_api.route('/services')
 def api_services():
+    """Les servies"""
     offset = int(request.args.get("offset", 0))
     limit = int(request.args.get("limit", 6))
 
     with bd.creer_connexion() as conn:
-        services = bd.get_services_pagination(conn, offset, limit)
+        services = bd.get_services_api(conn, offset, limit)
         for s in services:
             s["est_proprietaire"] = bd.verifier_proprietaire_service(
                 conn,
                 s["id_service"],
                 session.get("identifiant")
             )
+            s["image_path"] = utils.get_image_path(s["id_service"])
 
     return jsonify(services)
 
 @bp_api.route('/suggestion-recherche')
 def suggestion_rechercher():
     """Sugestion de recherche"""
-    query = request.args.get('query', '').strip().lower()
+    query = request.args.get('query', '').strip()
 
-    if not query or len(query) < 2:
+    if len(query) < 2:
         return jsonify([])
 
     with bd.creer_connexion() as conn:
