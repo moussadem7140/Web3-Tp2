@@ -14,7 +14,7 @@ function creerCarteService(service) {
     card.className = "card";
 
     const img = document.createElement("img");
-    img.src = service.photo;
+    img.src = `/static/images/ajouts/${service.photo}`;
     img.width = 100;
     img.height = 250;
     img.className = "card-img-top";
