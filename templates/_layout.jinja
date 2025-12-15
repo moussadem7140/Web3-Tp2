@@ -9,8 +9,6 @@
     <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="static/css/styles.sass" />
-    <script defer
-        src="/static/js/utils-ajax.js"> </script>
     {%block script%}
     {% endblock %}
 </head>
@@ -32,32 +30,32 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item pe-4">
-                            <a class="nav-link active" aria-current="page" href="/">Accueil</a>
+                            <a class="nav-link {% if request.endpoint == 'accueil' %}active{% endif %}" {% if request.endpoint == 'accueil' %}aria-current="page"{% endif %} href="/">Accueil</a>
                         </li>
                         {% if session.get('identifiant') %}
                         <li class="nav-item pe-4">
-                            <a class="nav-link" href="{{ url_for('services.ajouter_service') }}">Ajouter un service</a>
+                            <a class="nav-link {% if request.endpoint == 'services.ajouter_service' %}active{% endif %}" href="{{ url_for('services.ajouter_service') }}">Ajouter un service</a>
                         </li>
                         {% endif %}
                         {% if session.get('identifiant') and session.get('role') == "admin" %}
                         <li class="nav-item pe-4">
-                            <a class="nav-link" href="{{ url_for('compte.ajouter_utilisateur') }}">Ajouter un utilisateur</a>
+                            <a class="nav-link {% if request.endpoint == 'compte.ajouter_utilisateur' %}active{% endif %}" href="{{ url_for('compte.ajouter_utilisateur') }}">Ajouter un utilisateur</a>
                         </li>
                         <li class="nav-item pe-4">
-                            <a class="nav-link" href="{{ url_for('compte.liste_utilisateurs') }}">Liste des utilisateurs</a>
+                            <a class="nav-link {% if request.endpoint == 'compte.liste_utilisateurs' %}active{% endif %}" href="{{ url_for('compte.liste_utilisateurs') }}">Liste des utilisateurs</a>
                         </li>
                         {% endif %}
                         <li class="nav-item pe-4">
-                            <a class="nav-link" href="{{ url_for('services.listes_services') }}">Listes des services</a>
+                            <a class="nav-link {% if request.endpoint == 'services.listes_services' %}active{% endif %}" href="{{ url_for('services.listes_services') }}">Listes des services</a>
                         </li>
                         {% if not session.get('identifiant') %}
                         <li class="nav-item pe-4">
-                            <a class="nav-link" href="{{ url_for('compte.se_connecter') }}">Se_connecter</a>
+                            <a class="nav-link {% if request.endpoint == 'compte.se_connecter' %}active{% endif %}" href="{{ url_for('compte.se_connecter') }}">Se_connecter</a>
                         </li>
                         {% endif %}
                         {% if session.get('identifiant') %}
                         <li class="nav-item pe-4">
-                            <a class="nav-link" href="{{ url_for('compte.se_deconnecter') }}">Se_deconnecter</a>
+                            <a class="nav-link {% if request.endpoint == 'compte.se_deconnecter' %}active{% endif %}" href="{{ url_for('compte.se_deconnecter') }}">Se_deconnecter</a>
                         </li>
                         {% endif %}
                     </ul>

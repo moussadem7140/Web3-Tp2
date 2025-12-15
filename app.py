@@ -14,6 +14,12 @@ from services import bp_services
 from api import bp_api
 import bd
 
+if not os.getenv('BD_UTILISATEUR'):
+    dotenv.load_dotenv('.env')
+
+project_home = '/home/Valdess/420-05C-FX-TP-3-site'
+load_dotenv(os.path.join(project_home, '.env'))
+
 def create_app():
     """create"""
     app = Flask(__name__)

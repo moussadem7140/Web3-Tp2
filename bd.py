@@ -68,6 +68,28 @@ def get_services_api(conn, offset=0, limit=6):
         services = curseur.fetchall()
     return services
 
+def get_services_pagination(conn, offset, limit):
+    """Retourne tous les services avec pagination."""
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        SELECT
+            s.id_service,
+            s.titre,
+            s.description,
+            s.localisation,
+            s.photo,
+            s.actif,
+            s.id_utilisateur,
+            c.nom_categorie
+        FROM services s
+        JOIN categories c ON s.id_categorie = c.id_categorie
+        ORDER BY s.date_creation DESC
+        LIMIT %s OFFSET %s
+    """
+    cursor.execute(query, (limit, offset))
+    return cursor.fetchall()
+
+
 def get_service(conn, id_service):
        """Afficher les services"""
        with conn.get_curseur() as curseur:

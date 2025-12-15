@@ -44,8 +44,8 @@ function afficherResultats(resultats) {
                     const supprimerBtn = (service.est_proprietaire === true || role==="admin") ? `<a href="/services/supprimer/${service.id_service}" class="btn btn-primary m-2">Supprimer</a>` : '';
                     html += `
                     <div class="col-md-4 mb-3">
-                        <div class="card shadow-sm">+
-                            <img src="${photo}" class="card-img-top card-img p-2" alt="Image par défaut">
+                        <div class="card shadow-sm">
+                            <img src="${photo}" class="card-img-top" width="100" height="250" alt="Image par défaut">
                             <div class="card-body">
                                 <h5 class="card-title">${service.titre}</h5>
                                 <p class="card-text">

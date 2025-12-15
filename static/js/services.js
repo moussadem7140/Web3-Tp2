@@ -8,7 +8,7 @@ const limit = 6;
 // Crée une carte HTML pour un service
 function creerCarteService(service) {
     const col = document.createElement("div");
-    col.className = "col-sm-6 col-lg-4 mb-4";
+    col.className = "col-md-4 mb-3";
 
     const card = document.createElement("div");
     card.className = "card";
@@ -65,9 +65,9 @@ function creerCarteService(service) {
 }
 
 async function chargerServices() {
-    //const response = await fetch(`/api/services?offset=${offset}&limit=${limit}`);
-    //const services = await response.json();
-    const services = await envoyerRequeteAjax("api/services")
+    const response = await fetch(`/api/services?offset=${offset}&limit=${limit}`);
+    const services = await response.json();
+    //const services = await envoyerRequeteAjax("api/services")
 
     const row = document.getElementById("row-services");
 
@@ -99,15 +99,15 @@ function gererScroll() {
 }
 
 async function initialisation() {
-    try{
-       await chargerServices();
-       window.addEventListener("scroll", gererScroll);
-    }catch(error){
-        console.log(error);
-    }
-    //chargerServices().then(() => {
-        //window.addEventListener("scroll", gererScroll);
-    //});
+    //try{
+       //await chargerServices();
+       //window.addEventListener("scroll", gererScroll);
+    //}catch(error){
+        //console.log(error);
+    //}
+    chargerServices().then(() => {
+        window.addEventListener("scroll", gererScroll);
+    });
 }
 
 window.addEventListener("load", initialisation);
